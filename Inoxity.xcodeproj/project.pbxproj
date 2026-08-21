@@ -1,0 +1,1030 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B00000000000000000000001 /* Inoxity/App/InoxityApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000001 /* Inoxity/App/InoxityApp.swift */; };
+		B00000000000000000000002 /* Inoxity/App/AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000002 /* Inoxity/App/AppContainer.swift */; };
+		B00000000000000000000003 /* Inoxity/App/AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000003 /* Inoxity/App/AppState.swift */; };
+		B00000000000000000000004 /* Inoxity/App/RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000004 /* Inoxity/App/RootView.swift */; };
+		B00000000000000000000005 /* Inoxity/Configuration/Models/StudyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000005 /* Inoxity/Configuration/Models/StudyConfiguration.swift */; };
+		B00000000000000000000006 /* Inoxity/Configuration/Providers/StudyConfigurationProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000006 /* Inoxity/Configuration/Providers/StudyConfigurationProviding.swift */; };
+		B00000000000000000000007 /* Inoxity/Configuration/Validation/StudyConfigurationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000007 /* Inoxity/Configuration/Validation/StudyConfigurationValidator.swift */; };
+		B00000000000000000000008 /* Inoxity/Features/StudyCode/StudyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000008 /* Inoxity/Features/StudyCode/StudyCodeView.swift */; };
+		B00000000000000000000009 /* Inoxity/Features/Onboarding/OnboardingCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000009 /* Inoxity/Features/Onboarding/OnboardingCoordinatorView.swift */; };
+		B0000000000000000000000A /* Inoxity/Features/Main/MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000000A /* Inoxity/Features/Main/MainTabView.swift */; };
+		B0000000000000000000000B /* Inoxity/Features/About/AboutStudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000000B /* Inoxity/Features/About/AboutStudyView.swift */; };
+		B0000000000000000000000C /* Inoxity/Features/Settings/SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000000C /* Inoxity/Features/Settings/SettingsView.swift */; };
+		B0000000000000000000000D /* Inoxity/Shared/Components/InoxityComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000000D /* Inoxity/Shared/Components/InoxityComponents.swift */; };
+		B0000000000000000000000E /* Inoxity/Shared/DesignSystem/InoxityTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000000E /* Inoxity/Shared/DesignSystem/InoxityTheme.swift */; };
+		B0000000000000000000000F /* Inoxity/Shared/Utilities/StudyCodeNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000000F /* Inoxity/Shared/Utilities/StudyCodeNormalizer.swift */; };
+		B00000000000000000000011 /* Inoxity/Configuration/Resources/SleepStudy.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000012 /* Inoxity/Configuration/Resources/SleepStudy.json */; };
+		B00000000000000000000012 /* Inoxity/Configuration/Resources/ActivityStudy.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000013 /* Inoxity/Configuration/Resources/ActivityStudy.json */; };
+		B00000000000000000000013 /* Inoxity/Configuration/Resources/StudyConfigurationTemplate.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000014 /* Inoxity/Configuration/Resources/StudyConfigurationTemplate.json */; };
+		B00000000000000000000014 /* InoxityTests/StudyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000020 /* InoxityTests/StudyConfigurationTests.swift */; };
+		B00000000000000000000015 /* InoxityTests/AppStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000021 /* InoxityTests/AppStateTests.swift */; };
+		B00000000000000000000016 /* Inoxity/Configuration/Resources/SleepStudy.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000012 /* Inoxity/Configuration/Resources/SleepStudy.json */; };
+		B00000000000000000000017 /* Inoxity/Configuration/Resources/ActivityStudy.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000013 /* Inoxity/Configuration/Resources/ActivityStudy.json */; };
+		B00000000000000000000018 /* InoxityTests/Fixtures/MalformedStudy.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000022 /* InoxityTests/Fixtures/MalformedStudy.json */; };
+		B00000000000000000000019 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F00000000000000000000023 /* XCTest.framework */; };
+		B0000000000000000000001A /* Inoxity/Persistence/ParticipantState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000015 /* Inoxity/Persistence/ParticipantState.swift */; };
+		B0000000000000000000001B /* Inoxity/Persistence/ParticipantStatePersisting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000016 /* Inoxity/Persistence/ParticipantStatePersisting.swift */; };
+		B0000000000000000000001C /* Inoxity/Persistence/UserDefaultsParticipantStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000017 /* Inoxity/Persistence/UserDefaultsParticipantStateStore.swift */; };
+		B0000000000000000000001D /* InoxityTests/ParticipantStateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000024 /* InoxityTests/ParticipantStateStoreTests.swift */; };
+		B0000000000000000000001E /* Inoxity/HealthKit/HealthKitModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000025 /* Inoxity/HealthKit/HealthKitModels.swift */; };
+		B0000000000000000000001F /* Inoxity/HealthKit/HealthKitServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000026 /* Inoxity/HealthKit/HealthKitServicing.swift */; };
+		B00000000000000000000020 /* Inoxity/HealthKit/HealthKitTypeRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000027 /* Inoxity/HealthKit/HealthKitTypeRegistry.swift */; };
+		B00000000000000000000021 /* Inoxity/HealthKit/HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000028 /* Inoxity/HealthKit/HealthKitService.swift */; };
+		B00000000000000000000022 /* Inoxity/HealthKit/MockHealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000029 /* Inoxity/HealthKit/MockHealthKitService.swift */; };
+		B00000000000000000000023 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0000000000000000000002B /* HealthKit.framework */; };
+		B00000000000000000000024 /* InoxityTests/HealthKitTypeRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000002C /* InoxityTests/HealthKitTypeRegistryTests.swift */; };
+		B00000000000000000000025 /* InoxityTests/HealthKitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000002D /* InoxityTests/HealthKitServiceTests.swift */; };
+		B00000000000000000000026 /* InoxityTests/AppStateHealthKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000002E /* InoxityTests/AppStateHealthKitTests.swift */; };
+		B00000000000000000000027 /* Inoxity/Notifications/NotificationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000040 /* Inoxity/Notifications/NotificationModels.swift */; };
+		B00000000000000000000028 /* Inoxity/Notifications/NotificationServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000041 /* Inoxity/Notifications/NotificationServicing.swift */; };
+		B00000000000000000000029 /* Inoxity/Notifications/NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000042 /* Inoxity/Notifications/NotificationService.swift */; };
+		B0000000000000000000002A /* Inoxity/Notifications/MockNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000043 /* Inoxity/Notifications/MockNotificationService.swift */; };
+		B0000000000000000000002B /* Inoxity/Notifications/NotificationScheduleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000044 /* Inoxity/Notifications/NotificationScheduleBuilder.swift */; };
+		B0000000000000000000002C /* Inoxity/Notifications/NotificationIdentifierFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000045 /* Inoxity/Notifications/NotificationIdentifierFactory.swift */; };
+		B0000000000000000000002D /* Inoxity/Notifications/NotificationRouting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000046 /* Inoxity/Notifications/NotificationRouting.swift */; };
+		B0000000000000000000002E /* Inoxity/Notifications/SystemSettingsOpening.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000047 /* Inoxity/Notifications/SystemSettingsOpening.swift */; };
+		B0000000000000000000002F /* InoxityTests/NotificationConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000048 /* InoxityTests/NotificationConfigurationTests.swift */; };
+		B00000000000000000000030 /* InoxityTests/NotificationIdentifierFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000049 /* InoxityTests/NotificationIdentifierFactoryTests.swift */; };
+		B00000000000000000000031 /* InoxityTests/NotificationScheduleBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000004A /* InoxityTests/NotificationScheduleBuilderTests.swift */; };
+		B00000000000000000000032 /* InoxityTests/NotificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000004B /* InoxityTests/NotificationServiceTests.swift */; };
+		B00000000000000000000033 /* InoxityTests/AppStateNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000004C /* InoxityTests/AppStateNotificationTests.swift */; };
+		B00000000000000000000034 /* InoxityTests/NotificationRoutingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000004D /* InoxityTests/NotificationRoutingTests.swift */; };
+		B00000000000000000000050 /* Inoxity/Surveys/SurveyModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000050 /* Inoxity/Surveys/SurveyModels.swift */; };
+		B00000000000000000000051 /* Inoxity/Surveys/SurveyRuntimePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000051 /* Inoxity/Surveys/SurveyRuntimePolicy.swift */; };
+		B00000000000000000000052 /* Inoxity/Surveys/SurveyOccurrenceIdentifierFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000052 /* Inoxity/Surveys/SurveyOccurrenceIdentifierFactory.swift */; };
+		B00000000000000000000053 /* Inoxity/Surveys/SurveyOccurrenceBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000053 /* Inoxity/Surveys/SurveyOccurrenceBuilder.swift */; };
+		B00000000000000000000054 /* Inoxity/Surveys/SurveyURLBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000054 /* Inoxity/Surveys/SurveyURLBuilder.swift */; };
+		B00000000000000000000055 /* Inoxity/Surveys/SurveyCallbackParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000055 /* Inoxity/Surveys/SurveyCallbackParser.swift */; };
+		B00000000000000000000056 /* Inoxity/Surveys/SurveyPresenting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000056 /* Inoxity/Surveys/SurveyPresenting.swift */; };
+		B00000000000000000000057 /* Inoxity/Surveys/SurveyPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000057 /* Inoxity/Surveys/SurveyPresenter.swift */; };
+		B00000000000000000000058 /* Inoxity/Surveys/MockSurveyPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000058 /* Inoxity/Surveys/MockSurveyPresenter.swift */; };
+		B00000000000000000000059 /* Inoxity/Features/Surveys/SurveysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000059 /* Inoxity/Features/Surveys/SurveysView.swift */; };
+		B0000000000000000000005A /* Inoxity/Features/Surveys/SurveyOccurrenceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000005A /* Inoxity/Features/Surveys/SurveyOccurrenceCard.swift */; };
+		B0000000000000000000005B /* Inoxity/Features/Surveys/InAppSurveyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000005B /* Inoxity/Features/Surveys/InAppSurveyView.swift */; };
+		B0000000000000000000005C /* Inoxity/Surveys/SurveyCompletionValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000005C /* Inoxity/Surveys/SurveyCompletionValidator.swift */; };
+		B00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift */; };
+		B00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift */; };
+		B00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift */; };
+		B00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift */; };
+		B00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift */; };
+		B00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift */; };
+		B00000000000000000000066 /* InoxityTests/SurveyNotificationRoutingIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000066 /* InoxityTests/SurveyNotificationRoutingIntegrationTests.swift */; };
+		B00000000000000000000067 /* InoxityTests/AppStateSurveyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000067 /* InoxityTests/AppStateSurveyTests.swift */; };
+		B00000000000000000000068 /* InoxityTests/SurveyCompletionValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000068 /* InoxityTests/SurveyCompletionValidatorTests.swift */; };
+		B00000000000000000000070 /* Inoxity/Media/MediaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000070 /* Inoxity/Media/MediaModels.swift */; };
+		B00000000000000000000071 /* Inoxity/Media/MediaValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000071 /* Inoxity/Media/MediaValidator.swift */; };
+		B00000000000000000000072 /* Inoxity/Media/MediaSelectionLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000072 /* Inoxity/Media/MediaSelectionLoading.swift */; };
+		B00000000000000000000073 /* Inoxity/Media/MediaLibraryImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000073 /* Inoxity/Media/MediaLibraryImporter.swift */; };
+		B00000000000000000000074 /* Inoxity/Media/MediaStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000074 /* Inoxity/Media/MediaStoring.swift */; };
+		B00000000000000000000075 /* Inoxity/Media/MediaStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000075 /* Inoxity/Media/MediaStorage.swift */; };
+		B00000000000000000000076 /* Inoxity/Media/MediaThumbnailGenerating.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000076 /* Inoxity/Media/MediaThumbnailGenerating.swift */; };
+		B00000000000000000000077 /* Inoxity/Media/MediaThumbnailGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000077 /* Inoxity/Media/MediaThumbnailGenerator.swift */; };
+		B00000000000000000000078 /* Inoxity/Media/MockMediaStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000078 /* Inoxity/Media/MockMediaStorage.swift */; };
+		B0000000000000000000007A /* Inoxity/Media/MediaRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000007A /* Inoxity/Media/MediaRuntime.swift */; };
+		B0000000000000000000007B /* Inoxity/Features/Media/MediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000007B /* Inoxity/Features/Media/MediaView.swift */; };
+		B0000000000000000000007C /* Inoxity/Features/Media/MediaDraftCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000007C /* Inoxity/Features/Media/MediaDraftCard.swift */; };
+		B0000000000000000000007D /* Inoxity/Features/Media/MediaThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000000000000000000007D /* Inoxity/Features/Media/MediaThumbnailView.swift */; };
+		B00000000000000000000080 /* InoxityTests/MediaConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000080 /* InoxityTests/MediaConfigurationTests.swift */; };
+		B000000000000000000000C8 /* InoxityTests/AppStateMediaUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C8 /* InoxityTests/AppStateMediaUploadTests.swift */; };
+		B000000000000000000000C9 /* Inoxity/Features/Settings/ContactService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C9 /* Inoxity/Features/Settings/ContactService.swift */; };
+		B000000000000000000000CA /* Inoxity/Features/Settings/ContactSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000CA /* Inoxity/Features/Settings/ContactSheetView.swift */; };
+		B000000000000000000000CB /* Inoxity/Features/Completion/StudyCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000CB /* Inoxity/Features/Completion/StudyCompletionView.swift */; };
+		B000000000000000000000CC /* Inoxity/HealthKit/HealthKitCharacteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000CC /* Inoxity/HealthKit/HealthKitCharacteristics.swift */; };
+		B00000000000000000000082 /* InoxityTests/MediaStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000082 /* InoxityTests/MediaStorageTests.swift */; };
+		B00000000000000000000083 /* InoxityTests/MediaRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000083 /* InoxityTests/MediaRuntimeTests.swift */; };
+		B00000000000000000000084 /* InoxityTests/MediaPersistenceMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000084 /* InoxityTests/MediaPersistenceMigrationTests.swift */; };
+		B000000000000000000000A0 /* Inoxity/Enrollment/SONAIDValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A0 /* Inoxity/Enrollment/SONAIDValidator.swift */; };
+		B000000000000000000000A1 /* Inoxity/Withdrawal/WithdrawalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A1 /* Inoxity/Withdrawal/WithdrawalModels.swift */; };
+		B000000000000000000000A2 /* Inoxity/Withdrawal/WithdrawalEventPersisting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A2 /* Inoxity/Withdrawal/WithdrawalEventPersisting.swift */; };
+		B000000000000000000000A3 /* Inoxity/Withdrawal/UserDefaultsWithdrawalEventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A3 /* Inoxity/Withdrawal/UserDefaultsWithdrawalEventStore.swift */; };
+		B000000000000000000000A4 /* Inoxity/Withdrawal/WithdrawalServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A4 /* Inoxity/Withdrawal/WithdrawalServicing.swift */; };
+		B000000000000000000000A5 /* Inoxity/Withdrawal/WithdrawalRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A5 /* Inoxity/Withdrawal/WithdrawalRuntime.swift */; };
+		B000000000000000000000A6 /* Inoxity/Features/Withdrawal/WithdrawalFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A6 /* Inoxity/Features/Withdrawal/WithdrawalFlowView.swift */; };
+		B000000000000000000000A7 /* Inoxity/HealthSummary/HealthSummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A7 /* Inoxity/HealthSummary/HealthSummaryModels.swift */; };
+		B000000000000000000000A8 /* Inoxity/HealthSummary/HealthDataQuerying.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A8 /* Inoxity/HealthSummary/HealthDataQuerying.swift */; };
+		B000000000000000000000A9 /* Inoxity/HealthSummary/HealthSummaryProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000A9 /* Inoxity/HealthSummary/HealthSummaryProviding.swift */; };
+		B000000000000000000000AA /* Inoxity/HealthSummary/HealthSummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000AA /* Inoxity/HealthSummary/HealthSummaryService.swift */; };
+		B000000000000000000000AB /* Inoxity/HealthSummary/HealthKitHealthDataQueryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000AB /* Inoxity/HealthSummary/HealthKitHealthDataQueryService.swift */; };
+		B000000000000000000000AC /* Inoxity/HealthSummary/MockHealthSummaryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000AC /* Inoxity/HealthSummary/MockHealthSummaryProvider.swift */; };
+		B000000000000000000000AD /* Inoxity/Features/HealthSummary/SeeMyDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000AD /* Inoxity/Features/HealthSummary/SeeMyDataView.swift */; };
+		B000000000000000000000AE /* Inoxity/Features/HealthSummary/HealthSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000AE /* Inoxity/Features/HealthSummary/HealthSummaryCard.swift */; };
+		B000000000000000000000AF /* Inoxity/Notifications/NotificationDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000AF /* Inoxity/Notifications/NotificationDiagnostics.swift */; };
+		B000000000000000000000B0 /* Inoxity/Features/Settings/NotificationDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B0 /* Inoxity/Features/Settings/NotificationDiagnosticsView.swift */; };
+		B000000000000000000000B1 /* Inoxity/Backend/BackendModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B1 /* Inoxity/Backend/BackendModels.swift */; };
+		B000000000000000000000B2 /* Inoxity/Backend/ParticipantAuthenticating.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B2 /* Inoxity/Backend/ParticipantAuthenticating.swift */; };
+		B000000000000000000000B3 /* Inoxity/Backend/RemoteStudyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B3 /* Inoxity/Backend/RemoteStudyRepository.swift */; };
+		B000000000000000000000B4 /* Inoxity/Backend/RemoteEnrollmentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B4 /* Inoxity/Backend/RemoteEnrollmentRepository.swift */; };
+		B000000000000000000000B5 /* Inoxity/Backend/RemoteWithdrawalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B5 /* Inoxity/Backend/RemoteWithdrawalRepository.swift */; };
+		B000000000000000000000B6 /* Inoxity/Backend/HealthKitUploadRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B6 /* Inoxity/Backend/HealthKitUploadRepository.swift */; };
+		B000000000000000000000B7 /* Inoxity/Backend/SurveyCompletionUploadRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B7 /* Inoxity/Backend/SurveyCompletionUploadRepository.swift */; };
+		B000000000000000000000B8 /* Inoxity/Backend/MediaUploadRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B8 /* Inoxity/Backend/MediaUploadRepository.swift */; };
+		B000000000000000000000B9 /* Inoxity/Sync/SyncCoordinating.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000B9 /* Inoxity/Sync/SyncCoordinating.swift */; };
+		B000000000000000000000C0 /* InoxityTests/SONAIDValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C0 /* InoxityTests/SONAIDValidatorTests.swift */; };
+		B000000000000000000000C1 /* InoxityTests/HealthSummaryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C1 /* InoxityTests/HealthSummaryServiceTests.swift */; };
+		B000000000000000000000C2 /* InoxityTests/WithdrawalRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C2 /* InoxityTests/WithdrawalRuntimeTests.swift */; };
+		B000000000000000000000C3 /* InoxityTests/NotificationReliabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C3 /* InoxityTests/NotificationReliabilityTests.swift */; };
+		B000000000000000000000C4 /* InoxityTests/ParticipantStatePhase3MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C4 /* InoxityTests/ParticipantStatePhase3MigrationTests.swift */; };
+		B000000000000000000000C5 /* Inoxity/HealthSummary/DailyHealthSummaryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C5 /* Inoxity/HealthSummary/DailyHealthSummaryModels.swift */; };
+		B000000000000000000000C6 /* Inoxity/Features/HealthSummary/DaySelectorHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C6 /* Inoxity/Features/HealthSummary/DaySelectorHeader.swift */; };
+		B000000000000000000000C7 /* InoxityTests/DaySelectorHeaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000C7 /* InoxityTests/DaySelectorHeaderTests.swift */; };
+		B3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift */; };
+		B3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift */; };
+		B3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift */; };
+		B3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift */; };
+		B3B000000000000000000005 /* Inoxity/Enrollment/InstallationIDStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000005 /* Inoxity/Enrollment/InstallationIDStore.swift */; };
+		B3B000000000000000000006 /* Inoxity/Backend/Supabase/SupabaseRepositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000006 /* Inoxity/Backend/Supabase/SupabaseRepositories.swift */; };
+		B3B000000000000000000007 /* Inoxity/Sync/SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000007 /* Inoxity/Sync/SyncCoordinator.swift */; };
+		B3B000000000000000000008 /* Inoxity/Features/Settings/BackendDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000008 /* Inoxity/Features/Settings/BackendDiagnosticsView.swift */; };
+		B3B000000000000000000009 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = SP3B00000000000000000001 /* Supabase */; };
+		B3BT00000000000000000001 /* InoxityTests/Phase3BFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3BT00000000000000000001 /* InoxityTests/Phase3BFoundationTests.swift */; };
+		BD3D00000000000000000001 /* Inoxity/HealthKit/HealthKitUploadModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000001 /* Inoxity/HealthKit/HealthKitUploadModels.swift */; };
+		BD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */; };
+		BD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */; };
+		BD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */; };
+		BD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */; };
+		BD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift */; };
+		BA0000000000000000000001 /* Inoxity/Features/Main/HomeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000001 /* Inoxity/Features/Main/HomeStatus.swift */; };
+		BA0000000000000000000002 /* Inoxity/Features/Main/StudyProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000002 /* Inoxity/Features/Main/StudyProgress.swift */; };
+		BA0000000000000000000003 /* Inoxity/Features/Main/DailyMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000003 /* Inoxity/Features/Main/DailyMessages.swift */; };
+		BA0000000000000000000004 /* Inoxity/App/SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000004 /* Inoxity/App/SplashView.swift */; };
+		BA0000000000000000000005 /* InoxityTests/StudyProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000005 /* InoxityTests/StudyProgressTests.swift */; };
+		BA0000000000000000000006 /* Inoxity/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000011 /* Inoxity/Assets.xcassets */; };
+		BC0100000000000000000001 /* Inoxity/Features/Main/ParticipantStartDateResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000001 /* Inoxity/Features/Main/ParticipantStartDateResolver.swift */; };
+		BC0100000000000000000002 /* Inoxity/Features/Main/WaitingForStudyStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0100000000000000000002 /* Inoxity/Features/Main/WaitingForStudyStartView.swift */; };
+		BC0200000000000000000001 /* Inoxity/Configuration/RandomWindowScheduling.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0200000000000000000001 /* Inoxity/Configuration/RandomWindowScheduling.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C00000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = P00000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = T00000000000000000000001;
+			remoteInfo = Inoxity;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F00000000000000000000001 /* Inoxity/App/InoxityApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/App/InoxityApp.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000002 /* Inoxity/App/AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/App/AppContainer.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000003 /* Inoxity/App/AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/App/AppState.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000004 /* Inoxity/App/RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/App/RootView.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000005 /* Inoxity/Configuration/Models/StudyConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Configuration/Models/StudyConfiguration.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000006 /* Inoxity/Configuration/Providers/StudyConfigurationProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Configuration/Providers/StudyConfigurationProviding.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000007 /* Inoxity/Configuration/Validation/StudyConfigurationValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Configuration/Validation/StudyConfigurationValidator.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000008 /* Inoxity/Features/StudyCode/StudyCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/StudyCode/StudyCodeView.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000009 /* Inoxity/Features/Onboarding/OnboardingCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Onboarding/OnboardingCoordinatorView.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000000A /* Inoxity/Features/Main/MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Main/MainTabView.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000000B /* Inoxity/Features/About/AboutStudyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/About/AboutStudyView.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000000C /* Inoxity/Features/Settings/SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Settings/SettingsView.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000000D /* Inoxity/Shared/Components/InoxityComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Shared/Components/InoxityComponents.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000000E /* Inoxity/Shared/DesignSystem/InoxityTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Shared/DesignSystem/InoxityTheme.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000000F /* Inoxity/Shared/Utilities/StudyCodeNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Shared/Utilities/StudyCodeNormalizer.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000010 /* Inoxity/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Inoxity/Info.plist; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000011 /* Inoxity/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Inoxity/Assets.xcassets; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000012 /* Inoxity/Configuration/Resources/SleepStudy.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Inoxity/Configuration/Resources/SleepStudy.json; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000013 /* Inoxity/Configuration/Resources/ActivityStudy.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Inoxity/Configuration/Resources/ActivityStudy.json; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000014 /* Inoxity/Configuration/Resources/StudyConfigurationTemplate.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Inoxity/Configuration/Resources/StudyConfigurationTemplate.json; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000015 /* Inoxity/Persistence/ParticipantState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Persistence/ParticipantState.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000016 /* Inoxity/Persistence/ParticipantStatePersisting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Persistence/ParticipantStatePersisting.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000017 /* Inoxity/Persistence/UserDefaultsParticipantStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Persistence/UserDefaultsParticipantStateStore.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000020 /* InoxityTests/StudyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/StudyConfigurationTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000021 /* InoxityTests/AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/AppStateTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000022 /* InoxityTests/Fixtures/MalformedStudy.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = InoxityTests/Fixtures/MalformedStudy.json; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000023 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
+		F00000000000000000000024 /* InoxityTests/ParticipantStateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/ParticipantStateStoreTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000025 /* Inoxity/HealthKit/HealthKitModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitModels.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000026 /* Inoxity/HealthKit/HealthKitServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitServicing.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000027 /* Inoxity/HealthKit/HealthKitTypeRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitTypeRegistry.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000028 /* Inoxity/HealthKit/HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitService.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000029 /* Inoxity/HealthKit/MockHealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/MockHealthKitService.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000002A /* Inoxity/Inoxity.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Inoxity/Inoxity.entitlements; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000002B /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		F0000000000000000000002C /* InoxityTests/HealthKitTypeRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/HealthKitTypeRegistryTests.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000002D /* InoxityTests/HealthKitServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/HealthKitServiceTests.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000002E /* InoxityTests/AppStateHealthKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/AppStateHealthKitTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000030 /* Inoxity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = Inoxity.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F00000000000000000000031 /* InoxityTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = InoxityTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F00000000000000000000040 /* Inoxity/Notifications/NotificationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/NotificationModels.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000041 /* Inoxity/Notifications/NotificationServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/NotificationServicing.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000042 /* Inoxity/Notifications/NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/NotificationService.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000043 /* Inoxity/Notifications/MockNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/MockNotificationService.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000044 /* Inoxity/Notifications/NotificationScheduleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/NotificationScheduleBuilder.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000045 /* Inoxity/Notifications/NotificationIdentifierFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/NotificationIdentifierFactory.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000046 /* Inoxity/Notifications/NotificationRouting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/NotificationRouting.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000047 /* Inoxity/Notifications/SystemSettingsOpening.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/SystemSettingsOpening.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000048 /* InoxityTests/NotificationConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/NotificationConfigurationTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000049 /* InoxityTests/NotificationIdentifierFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/NotificationIdentifierFactoryTests.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000004A /* InoxityTests/NotificationScheduleBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/NotificationScheduleBuilderTests.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000004B /* InoxityTests/NotificationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/NotificationServiceTests.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000004C /* InoxityTests/AppStateNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/AppStateNotificationTests.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000004D /* InoxityTests/NotificationRoutingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/NotificationRoutingTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000050 /* Inoxity/Surveys/SurveyModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyModels.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000051 /* Inoxity/Surveys/SurveyRuntimePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyRuntimePolicy.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000052 /* Inoxity/Surveys/SurveyOccurrenceIdentifierFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyOccurrenceIdentifierFactory.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000053 /* Inoxity/Surveys/SurveyOccurrenceBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyOccurrenceBuilder.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000054 /* Inoxity/Surveys/SurveyURLBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyURLBuilder.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000055 /* Inoxity/Surveys/SurveyCallbackParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyCallbackParser.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000056 /* Inoxity/Surveys/SurveyPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyPresenting.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000057 /* Inoxity/Surveys/SurveyPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyPresenter.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000058 /* Inoxity/Surveys/MockSurveyPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/MockSurveyPresenter.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000059 /* Inoxity/Features/Surveys/SurveysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Surveys/SurveysView.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000005A /* Inoxity/Features/Surveys/SurveyOccurrenceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Surveys/SurveyOccurrenceCard.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000005B /* Inoxity/Features/Surveys/InAppSurveyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Surveys/InAppSurveyView.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000005C /* Inoxity/Surveys/SurveyCompletionValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Surveys/SurveyCompletionValidator.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyConfigurationTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyOccurrenceBuilderTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyURLBuilderTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyCallbackParserTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyPersistenceMigrationTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000066 /* InoxityTests/SurveyNotificationRoutingIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyNotificationRoutingIntegrationTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000067 /* InoxityTests/AppStateSurveyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/AppStateSurveyTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000068 /* InoxityTests/SurveyCompletionValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyCompletionValidatorTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000070 /* Inoxity/Media/MediaModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaModels.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000071 /* Inoxity/Media/MediaValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaValidator.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000072 /* Inoxity/Media/MediaSelectionLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaSelectionLoading.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000073 /* Inoxity/Media/MediaLibraryImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaLibraryImporter.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000074 /* Inoxity/Media/MediaStoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaStoring.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000075 /* Inoxity/Media/MediaStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaStorage.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000076 /* Inoxity/Media/MediaThumbnailGenerating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaThumbnailGenerating.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000077 /* Inoxity/Media/MediaThumbnailGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaThumbnailGenerator.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000078 /* Inoxity/Media/MockMediaStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MockMediaStorage.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000007A /* Inoxity/Media/MediaRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Media/MediaRuntime.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000007B /* Inoxity/Features/Media/MediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Media/MediaView.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000007C /* Inoxity/Features/Media/MediaDraftCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Media/MediaDraftCard.swift; sourceTree = SOURCE_ROOT; };
+		F0000000000000000000007D /* Inoxity/Features/Media/MediaThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Media/MediaThumbnailView.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000080 /* InoxityTests/MediaConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/MediaConfigurationTests.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C8 /* InoxityTests/AppStateMediaUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/AppStateMediaUploadTests.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C9 /* Inoxity/Features/Settings/ContactService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Settings/ContactService.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000CA /* Inoxity/Features/Settings/ContactSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Settings/ContactSheetView.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000CB /* Inoxity/Features/Completion/StudyCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Completion/StudyCompletionView.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000CC /* Inoxity/HealthKit/HealthKitCharacteristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitCharacteristics.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000082 /* InoxityTests/MediaStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/MediaStorageTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000083 /* InoxityTests/MediaRuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/MediaRuntimeTests.swift; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000084 /* InoxityTests/MediaPersistenceMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/MediaPersistenceMigrationTests.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A0 /* Inoxity/Enrollment/SONAIDValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Enrollment/SONAIDValidator.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A1 /* Inoxity/Withdrawal/WithdrawalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Withdrawal/WithdrawalModels.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A2 /* Inoxity/Withdrawal/WithdrawalEventPersisting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Withdrawal/WithdrawalEventPersisting.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A3 /* Inoxity/Withdrawal/UserDefaultsWithdrawalEventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Withdrawal/UserDefaultsWithdrawalEventStore.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A4 /* Inoxity/Withdrawal/WithdrawalServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Withdrawal/WithdrawalServicing.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A5 /* Inoxity/Withdrawal/WithdrawalRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Withdrawal/WithdrawalRuntime.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A6 /* Inoxity/Features/Withdrawal/WithdrawalFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Withdrawal/WithdrawalFlowView.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A7 /* Inoxity/HealthSummary/HealthSummaryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthSummary/HealthSummaryModels.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A8 /* Inoxity/HealthSummary/HealthDataQuerying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthSummary/HealthDataQuerying.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000A9 /* Inoxity/HealthSummary/HealthSummaryProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthSummary/HealthSummaryProviding.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000AA /* Inoxity/HealthSummary/HealthSummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthSummary/HealthSummaryService.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000AB /* Inoxity/HealthSummary/HealthKitHealthDataQueryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthSummary/HealthKitHealthDataQueryService.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000AC /* Inoxity/HealthSummary/MockHealthSummaryProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthSummary/MockHealthSummaryProvider.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000AD /* Inoxity/Features/HealthSummary/SeeMyDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/HealthSummary/SeeMyDataView.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000AE /* Inoxity/Features/HealthSummary/HealthSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/HealthSummary/HealthSummaryCard.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000AF /* Inoxity/Notifications/NotificationDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Notifications/NotificationDiagnostics.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B0 /* Inoxity/Features/Settings/NotificationDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Settings/NotificationDiagnosticsView.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B1 /* Inoxity/Backend/BackendModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/BackendModels.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B2 /* Inoxity/Backend/ParticipantAuthenticating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/ParticipantAuthenticating.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B3 /* Inoxity/Backend/RemoteStudyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/RemoteStudyRepository.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B4 /* Inoxity/Backend/RemoteEnrollmentRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/RemoteEnrollmentRepository.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B5 /* Inoxity/Backend/RemoteWithdrawalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/RemoteWithdrawalRepository.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B6 /* Inoxity/Backend/HealthKitUploadRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/HealthKitUploadRepository.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B7 /* Inoxity/Backend/SurveyCompletionUploadRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/SurveyCompletionUploadRepository.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B8 /* Inoxity/Backend/MediaUploadRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/MediaUploadRepository.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000B9 /* Inoxity/Sync/SyncCoordinating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Sync/SyncCoordinating.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C0 /* InoxityTests/SONAIDValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SONAIDValidatorTests.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C1 /* InoxityTests/HealthSummaryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/HealthSummaryServiceTests.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C2 /* InoxityTests/WithdrawalRuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/WithdrawalRuntimeTests.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C3 /* InoxityTests/NotificationReliabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/NotificationReliabilityTests.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C4 /* InoxityTests/ParticipantStatePhase3MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/ParticipantStatePhase3MigrationTests.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C5 /* Inoxity/HealthSummary/DailyHealthSummaryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthSummary/DailyHealthSummaryModels.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C6 /* Inoxity/Features/HealthSummary/DaySelectorHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/HealthSummary/DaySelectorHeader.swift; sourceTree = SOURCE_ROOT; };
+		F000000000000000000000C7 /* InoxityTests/DaySelectorHeaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/DaySelectorHeaderTests.swift; sourceTree = SOURCE_ROOT; };
+		F3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/BackendDomain.swift; sourceTree = SOURCE_ROOT; };
+		F3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/Environment/BackendEnvironment.swift; sourceTree = SOURCE_ROOT; };
+		F3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Shared/Logging/SanitizedLogger.swift; sourceTree = SOURCE_ROOT; };
+		F3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Configuration/Cache/StudyConfigurationCache.swift; sourceTree = SOURCE_ROOT; };
+		F3B000000000000000000005 /* Inoxity/Enrollment/InstallationIDStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Enrollment/InstallationIDStore.swift; sourceTree = SOURCE_ROOT; };
+		F3B000000000000000000006 /* Inoxity/Backend/Supabase/SupabaseRepositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/Supabase/SupabaseRepositories.swift; sourceTree = SOURCE_ROOT; };
+		F3B000000000000000000007 /* Inoxity/Sync/SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Sync/SyncCoordinator.swift; sourceTree = SOURCE_ROOT; };
+		F3B000000000000000000008 /* Inoxity/Features/Settings/BackendDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Settings/BackendDiagnosticsView.swift; sourceTree = SOURCE_ROOT; };
+		F3BC00000000000000000001 /* Config/Development.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Development.xcconfig; sourceTree = SOURCE_ROOT; };
+		F3BC00000000000000000002 /* Config/Staging.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Staging.xcconfig; sourceTree = SOURCE_ROOT; };
+		F3BC00000000000000000003 /* Config/Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Production.xcconfig; sourceTree = SOURCE_ROOT; };
+		F3BT00000000000000000001 /* InoxityTests/Phase3BFoundationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/Phase3BFoundationTests.swift; sourceTree = SOURCE_ROOT; };
+		FD3D00000000000000000001 /* Inoxity/HealthKit/HealthKitUploadModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitUploadModels.swift; sourceTree = SOURCE_ROOT; };
+		FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitSampleQuerying.swift; sourceTree = SOURCE_ROOT; };
+		FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitUploadPersistence.swift; sourceTree = SOURCE_ROOT; };
+		FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitUploadCoordinator.swift; sourceTree = SOURCE_ROOT; };
+		FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift; sourceTree = SOURCE_ROOT; };
+		FD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/HealthKitUploadPipelineTests.swift; sourceTree = SOURCE_ROOT; };
+		FA0000000000000000000001 /* Inoxity/Features/Main/HomeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Main/HomeStatus.swift; sourceTree = SOURCE_ROOT; };
+		FA0000000000000000000002 /* Inoxity/Features/Main/StudyProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Main/StudyProgress.swift; sourceTree = SOURCE_ROOT; };
+		FA0000000000000000000003 /* Inoxity/Features/Main/DailyMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Main/DailyMessages.swift; sourceTree = SOURCE_ROOT; };
+		FA0000000000000000000004 /* Inoxity/App/SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/App/SplashView.swift; sourceTree = SOURCE_ROOT; };
+		FA0000000000000000000005 /* InoxityTests/StudyProgressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/StudyProgressTests.swift; sourceTree = SOURCE_ROOT; };
+		FC0100000000000000000001 /* Inoxity/Features/Main/ParticipantStartDateResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Main/ParticipantStartDateResolver.swift; sourceTree = SOURCE_ROOT; };
+		FC0100000000000000000002 /* Inoxity/Features/Main/WaitingForStudyStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Main/WaitingForStudyStartView.swift; sourceTree = SOURCE_ROOT; };
+		FC0200000000000000000001 /* Inoxity/Configuration/RandomWindowScheduling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Configuration/RandomWindowScheduling.swift; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		H00000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000023 /* HealthKit.framework in Frameworks */,
+				B3B000000000000000000009 /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		H00000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000019 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		84598BF030210E0B00770DEE /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				FD3D00000000000000000001 /* Inoxity/HealthKit/HealthKitUploadModels.swift */,
+				FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */,
+				FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */,
+				FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */,
+				FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */,
+				F3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift */,
+				F3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift */,
+				F3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift */,
+				F3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift */,
+				F3B000000000000000000005 /* Inoxity/Enrollment/InstallationIDStore.swift */,
+				F3B000000000000000000006 /* Inoxity/Backend/Supabase/SupabaseRepositories.swift */,
+				F3B000000000000000000007 /* Inoxity/Sync/SyncCoordinator.swift */,
+				F3B000000000000000000008 /* Inoxity/Features/Settings/BackendDiagnosticsView.swift */,
+				F0000000000000000000005C /* Inoxity/Surveys/SurveyCompletionValidator.swift */,
+				F00000000000000000000070 /* Inoxity/Media/MediaModels.swift */,
+				F00000000000000000000071 /* Inoxity/Media/MediaValidator.swift */,
+				F00000000000000000000072 /* Inoxity/Media/MediaSelectionLoading.swift */,
+				F00000000000000000000073 /* Inoxity/Media/MediaLibraryImporter.swift */,
+				F00000000000000000000074 /* Inoxity/Media/MediaStoring.swift */,
+				F00000000000000000000075 /* Inoxity/Media/MediaStorage.swift */,
+				F00000000000000000000076 /* Inoxity/Media/MediaThumbnailGenerating.swift */,
+				F00000000000000000000077 /* Inoxity/Media/MediaThumbnailGenerator.swift */,
+				F00000000000000000000078 /* Inoxity/Media/MockMediaStorage.swift */,
+				F0000000000000000000007A /* Inoxity/Media/MediaRuntime.swift */,
+				F0000000000000000000007B /* Inoxity/Features/Media/MediaView.swift */,
+				F0000000000000000000007C /* Inoxity/Features/Media/MediaDraftCard.swift */,
+				F0000000000000000000007D /* Inoxity/Features/Media/MediaThumbnailView.swift */,
+				F000000000000000000000A0 /* Inoxity/Enrollment/SONAIDValidator.swift */,
+				F000000000000000000000A1 /* Inoxity/Withdrawal/WithdrawalModels.swift */,
+				F000000000000000000000A2 /* Inoxity/Withdrawal/WithdrawalEventPersisting.swift */,
+				F000000000000000000000A3 /* Inoxity/Withdrawal/UserDefaultsWithdrawalEventStore.swift */,
+				F000000000000000000000A4 /* Inoxity/Withdrawal/WithdrawalServicing.swift */,
+				F000000000000000000000A5 /* Inoxity/Withdrawal/WithdrawalRuntime.swift */,
+				F000000000000000000000A6 /* Inoxity/Features/Withdrawal/WithdrawalFlowView.swift */,
+				F000000000000000000000A7 /* Inoxity/HealthSummary/HealthSummaryModels.swift */,
+				F000000000000000000000A8 /* Inoxity/HealthSummary/HealthDataQuerying.swift */,
+				F000000000000000000000A9 /* Inoxity/HealthSummary/HealthSummaryProviding.swift */,
+				F000000000000000000000AA /* Inoxity/HealthSummary/HealthSummaryService.swift */,
+				F000000000000000000000AB /* Inoxity/HealthSummary/HealthKitHealthDataQueryService.swift */,
+				F000000000000000000000AC /* Inoxity/HealthSummary/MockHealthSummaryProvider.swift */,
+				F000000000000000000000AD /* Inoxity/Features/HealthSummary/SeeMyDataView.swift */,
+				F000000000000000000000AE /* Inoxity/Features/HealthSummary/HealthSummaryCard.swift */,
+				F000000000000000000000AF /* Inoxity/Notifications/NotificationDiagnostics.swift */,
+				F000000000000000000000B0 /* Inoxity/Features/Settings/NotificationDiagnosticsView.swift */,
+				F000000000000000000000B1 /* Inoxity/Backend/BackendModels.swift */,
+				F000000000000000000000B2 /* Inoxity/Backend/ParticipantAuthenticating.swift */,
+				F000000000000000000000B3 /* Inoxity/Backend/RemoteStudyRepository.swift */,
+				F000000000000000000000B4 /* Inoxity/Backend/RemoteEnrollmentRepository.swift */,
+				F000000000000000000000B5 /* Inoxity/Backend/RemoteWithdrawalRepository.swift */,
+				F000000000000000000000B6 /* Inoxity/Backend/HealthKitUploadRepository.swift */,
+				F000000000000000000000B7 /* Inoxity/Backend/SurveyCompletionUploadRepository.swift */,
+				F000000000000000000000B8 /* Inoxity/Backend/MediaUploadRepository.swift */,
+				F000000000000000000000B9 /* Inoxity/Sync/SyncCoordinating.swift */,
+				FD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift */,
+				F3BT00000000000000000001 /* InoxityTests/Phase3BFoundationTests.swift */,
+				F000000000000000000000C0 /* InoxityTests/SONAIDValidatorTests.swift */,
+				F000000000000000000000C1 /* InoxityTests/HealthSummaryServiceTests.swift */,
+				F000000000000000000000C2 /* InoxityTests/WithdrawalRuntimeTests.swift */,
+				F000000000000000000000C3 /* InoxityTests/NotificationReliabilityTests.swift */,
+				F000000000000000000000C4 /* InoxityTests/ParticipantStatePhase3MigrationTests.swift */,
+				F000000000000000000000C5 /* Inoxity/HealthSummary/DailyHealthSummaryModels.swift */,
+				F000000000000000000000C6 /* Inoxity/Features/HealthSummary/DaySelectorHeader.swift */,
+				F000000000000000000000C7 /* InoxityTests/DaySelectorHeaderTests.swift */,
+				F3BC00000000000000000001 /* Config/Development.xcconfig */,
+				F3BC00000000000000000002 /* Config/Staging.xcconfig */,
+				F3BC00000000000000000003 /* Config/Production.xcconfig */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		G00000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				G00000000000000000000002 /* Inoxity */,
+				G00000000000000000000003 /* InoxityTests */,
+				G00000000000000000000004 /* Products */,
+				84598BF030210E0B00770DEE /* Recovered References */,
+			);
+			sourceTree = "<group>";
+		};
+		G00000000000000000000002 /* Inoxity */ = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000001 /* Inoxity/App/InoxityApp.swift */,
+				F00000000000000000000002 /* Inoxity/App/AppContainer.swift */,
+				F00000000000000000000003 /* Inoxity/App/AppState.swift */,
+				F00000000000000000000004 /* Inoxity/App/RootView.swift */,
+				F00000000000000000000005 /* Inoxity/Configuration/Models/StudyConfiguration.swift */,
+				F00000000000000000000006 /* Inoxity/Configuration/Providers/StudyConfigurationProviding.swift */,
+				F00000000000000000000007 /* Inoxity/Configuration/Validation/StudyConfigurationValidator.swift */,
+				FC0200000000000000000001 /* Inoxity/Configuration/RandomWindowScheduling.swift */,
+				F00000000000000000000008 /* Inoxity/Features/StudyCode/StudyCodeView.swift */,
+				F00000000000000000000009 /* Inoxity/Features/Onboarding/OnboardingCoordinatorView.swift */,
+				F0000000000000000000000A /* Inoxity/Features/Main/MainTabView.swift */,
+				FA0000000000000000000001 /* Inoxity/Features/Main/HomeStatus.swift */,
+				FA0000000000000000000002 /* Inoxity/Features/Main/StudyProgress.swift */,
+				FA0000000000000000000003 /* Inoxity/Features/Main/DailyMessages.swift */,
+				FA0000000000000000000004 /* Inoxity/App/SplashView.swift */,
+				FC0100000000000000000001 /* Inoxity/Features/Main/ParticipantStartDateResolver.swift */,
+				FC0100000000000000000002 /* Inoxity/Features/Main/WaitingForStudyStartView.swift */,
+				F0000000000000000000000B /* Inoxity/Features/About/AboutStudyView.swift */,
+				F0000000000000000000000C /* Inoxity/Features/Settings/SettingsView.swift */,
+				F000000000000000000000C9 /* Inoxity/Features/Settings/ContactService.swift */,
+				F000000000000000000000CA /* Inoxity/Features/Settings/ContactSheetView.swift */,
+				F000000000000000000000CB /* Inoxity/Features/Completion/StudyCompletionView.swift */,
+				F000000000000000000000CC /* Inoxity/HealthKit/HealthKitCharacteristics.swift */,
+				F0000000000000000000000D /* Inoxity/Shared/Components/InoxityComponents.swift */,
+				F0000000000000000000000E /* Inoxity/Shared/DesignSystem/InoxityTheme.swift */,
+				F0000000000000000000000F /* Inoxity/Shared/Utilities/StudyCodeNormalizer.swift */,
+				F00000000000000000000010 /* Inoxity/Info.plist */,
+				F00000000000000000000011 /* Inoxity/Assets.xcassets */,
+				F00000000000000000000012 /* Inoxity/Configuration/Resources/SleepStudy.json */,
+				F00000000000000000000013 /* Inoxity/Configuration/Resources/ActivityStudy.json */,
+				F00000000000000000000014 /* Inoxity/Configuration/Resources/StudyConfigurationTemplate.json */,
+				F00000000000000000000015 /* Inoxity/Persistence/ParticipantState.swift */,
+				F00000000000000000000016 /* Inoxity/Persistence/ParticipantStatePersisting.swift */,
+				F00000000000000000000017 /* Inoxity/Persistence/UserDefaultsParticipantStateStore.swift */,
+				F00000000000000000000025 /* Inoxity/HealthKit/HealthKitModels.swift */,
+				F00000000000000000000026 /* Inoxity/HealthKit/HealthKitServicing.swift */,
+				F00000000000000000000027 /* Inoxity/HealthKit/HealthKitTypeRegistry.swift */,
+				F00000000000000000000028 /* Inoxity/HealthKit/HealthKitService.swift */,
+				F00000000000000000000029 /* Inoxity/HealthKit/MockHealthKitService.swift */,
+				F0000000000000000000002A /* Inoxity/Inoxity.entitlements */,
+				F0000000000000000000002B /* HealthKit.framework */,
+				F00000000000000000000040 /* Inoxity/Notifications/NotificationModels.swift */,
+				F00000000000000000000041 /* Inoxity/Notifications/NotificationServicing.swift */,
+				F00000000000000000000042 /* Inoxity/Notifications/NotificationService.swift */,
+				F00000000000000000000043 /* Inoxity/Notifications/MockNotificationService.swift */,
+				F00000000000000000000044 /* Inoxity/Notifications/NotificationScheduleBuilder.swift */,
+				F00000000000000000000045 /* Inoxity/Notifications/NotificationIdentifierFactory.swift */,
+				F00000000000000000000046 /* Inoxity/Notifications/NotificationRouting.swift */,
+				F00000000000000000000047 /* Inoxity/Notifications/SystemSettingsOpening.swift */,
+				F00000000000000000000050 /* Inoxity/Surveys/SurveyModels.swift */,
+				F00000000000000000000051 /* Inoxity/Surveys/SurveyRuntimePolicy.swift */,
+				F00000000000000000000052 /* Inoxity/Surveys/SurveyOccurrenceIdentifierFactory.swift */,
+				F00000000000000000000053 /* Inoxity/Surveys/SurveyOccurrenceBuilder.swift */,
+				F00000000000000000000054 /* Inoxity/Surveys/SurveyURLBuilder.swift */,
+				F00000000000000000000055 /* Inoxity/Surveys/SurveyCallbackParser.swift */,
+				F00000000000000000000056 /* Inoxity/Surveys/SurveyPresenting.swift */,
+				F00000000000000000000057 /* Inoxity/Surveys/SurveyPresenter.swift */,
+				F00000000000000000000058 /* Inoxity/Surveys/MockSurveyPresenter.swift */,
+				F00000000000000000000059 /* Inoxity/Features/Surveys/SurveysView.swift */,
+				F0000000000000000000005A /* Inoxity/Features/Surveys/SurveyOccurrenceCard.swift */,
+				F0000000000000000000005B /* Inoxity/Features/Surveys/InAppSurveyView.swift */,
+			);
+			name = Inoxity;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000003 /* InoxityTests */ = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000020 /* InoxityTests/StudyConfigurationTests.swift */,
+				F00000000000000000000021 /* InoxityTests/AppStateTests.swift */,
+				F00000000000000000000022 /* InoxityTests/Fixtures/MalformedStudy.json */,
+				F00000000000000000000023 /* XCTest.framework */,
+				F00000000000000000000024 /* InoxityTests/ParticipantStateStoreTests.swift */,
+				F0000000000000000000002C /* InoxityTests/HealthKitTypeRegistryTests.swift */,
+				F0000000000000000000002D /* InoxityTests/HealthKitServiceTests.swift */,
+				F0000000000000000000002E /* InoxityTests/AppStateHealthKitTests.swift */,
+				F00000000000000000000048 /* InoxityTests/NotificationConfigurationTests.swift */,
+				F00000000000000000000049 /* InoxityTests/NotificationIdentifierFactoryTests.swift */,
+				F0000000000000000000004A /* InoxityTests/NotificationScheduleBuilderTests.swift */,
+				F0000000000000000000004B /* InoxityTests/NotificationServiceTests.swift */,
+				F0000000000000000000004C /* InoxityTests/AppStateNotificationTests.swift */,
+				F0000000000000000000004D /* InoxityTests/NotificationRoutingTests.swift */,
+				F00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift */,
+				F00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift */,
+				F00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift */,
+				F00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift */,
+				F00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift */,
+				F00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift */,
+				F00000000000000000000066 /* InoxityTests/SurveyNotificationRoutingIntegrationTests.swift */,
+				F00000000000000000000067 /* InoxityTests/AppStateSurveyTests.swift */,
+				F00000000000000000000068 /* InoxityTests/SurveyCompletionValidatorTests.swift */,
+				F00000000000000000000080 /* InoxityTests/MediaConfigurationTests.swift */,
+				F000000000000000000000C8 /* InoxityTests/AppStateMediaUploadTests.swift */,
+				F00000000000000000000082 /* InoxityTests/MediaStorageTests.swift */,
+				F00000000000000000000083 /* InoxityTests/MediaRuntimeTests.swift */,
+				F00000000000000000000084 /* InoxityTests/MediaPersistenceMigrationTests.swift */,
+				FA0000000000000000000005 /* InoxityTests/StudyProgressTests.swift */,
+			);
+			name = InoxityTests;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000030 /* Inoxity.app */,
+				F00000000000000000000031 /* InoxityTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T00000000000000000000001 /* Inoxity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L00000000000000000000002 /* Build configuration list for PBXNativeTarget "Inoxity" */;
+			buildPhases = (
+				S00000000000000000000001 /* Sources */,
+				H00000000000000000000001 /* Frameworks */,
+				R00000000000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Inoxity;
+			packageProductDependencies = (
+				SP3B00000000000000000001 /* Supabase */,
+			);
+			productName = Inoxity;
+			productReference = F00000000000000000000030 /* Inoxity.app */;
+			productType = "com.apple.product-type.application";
+		};
+		T00000000000000000000002 /* InoxityTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L00000000000000000000003 /* Build configuration list for PBXNativeTarget "InoxityTests" */;
+			buildPhases = (
+				S00000000000000000000002 /* Sources */,
+				H00000000000000000000002 /* Frameworks */,
+				R00000000000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D00000000000000000000001 /* PBXTargetDependency */,
+			);
+			name = InoxityTests;
+			productName = InoxityTests;
+			productReference = F00000000000000000000031 /* InoxityTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		P00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					T00000000000000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					T00000000000000000000002 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = T00000000000000000000001;
+					};
+				};
+			};
+			buildConfigurationList = L00000000000000000000001 /* Build configuration list for PBXProject "Inoxity" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = G00000000000000000000001;
+			packageReferences = (
+				PKG3B0000000000000000001 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
+			productRefGroup = G00000000000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				T00000000000000000000001 /* Inoxity */,
+				T00000000000000000000002 /* InoxityTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		R00000000000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000011 /* Inoxity/Configuration/Resources/SleepStudy.json in Resources */,
+				B00000000000000000000012 /* Inoxity/Configuration/Resources/ActivityStudy.json in Resources */,
+				B00000000000000000000013 /* Inoxity/Configuration/Resources/StudyConfigurationTemplate.json in Resources */,
+				BA0000000000000000000006 /* Inoxity/Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		R00000000000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000016 /* Inoxity/Configuration/Resources/SleepStudy.json in Resources */,
+				B00000000000000000000017 /* Inoxity/Configuration/Resources/ActivityStudy.json in Resources */,
+				B00000000000000000000018 /* InoxityTests/Fixtures/MalformedStudy.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		S00000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD3D00000000000000000001 /* Inoxity/HealthKit/HealthKitUploadModels.swift in Sources */,
+				BD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift in Sources */,
+				BD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift in Sources */,
+				BD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift in Sources */,
+				BD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift in Sources */,
+				B3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift in Sources */,
+				B3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift in Sources */,
+				B3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift in Sources */,
+				B3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift in Sources */,
+				B3B000000000000000000005 /* Inoxity/Enrollment/InstallationIDStore.swift in Sources */,
+				B3B000000000000000000006 /* Inoxity/Backend/Supabase/SupabaseRepositories.swift in Sources */,
+				B3B000000000000000000007 /* Inoxity/Sync/SyncCoordinator.swift in Sources */,
+				B3B000000000000000000008 /* Inoxity/Features/Settings/BackendDiagnosticsView.swift in Sources */,
+				B00000000000000000000001 /* Inoxity/App/InoxityApp.swift in Sources */,
+				B00000000000000000000002 /* Inoxity/App/AppContainer.swift in Sources */,
+				B00000000000000000000003 /* Inoxity/App/AppState.swift in Sources */,
+				B00000000000000000000004 /* Inoxity/App/RootView.swift in Sources */,
+				B00000000000000000000005 /* Inoxity/Configuration/Models/StudyConfiguration.swift in Sources */,
+				B00000000000000000000006 /* Inoxity/Configuration/Providers/StudyConfigurationProviding.swift in Sources */,
+				B00000000000000000000007 /* Inoxity/Configuration/Validation/StudyConfigurationValidator.swift in Sources */,
+				B00000000000000000000008 /* Inoxity/Features/StudyCode/StudyCodeView.swift in Sources */,
+				B00000000000000000000009 /* Inoxity/Features/Onboarding/OnboardingCoordinatorView.swift in Sources */,
+				B0000000000000000000000A /* Inoxity/Features/Main/MainTabView.swift in Sources */,
+				B0000000000000000000000B /* Inoxity/Features/About/AboutStudyView.swift in Sources */,
+				B0000000000000000000000C /* Inoxity/Features/Settings/SettingsView.swift in Sources */,
+				B000000000000000000000C9 /* Inoxity/Features/Settings/ContactService.swift in Sources */,
+				B000000000000000000000CA /* Inoxity/Features/Settings/ContactSheetView.swift in Sources */,
+				B000000000000000000000CB /* Inoxity/Features/Completion/StudyCompletionView.swift in Sources */,
+				B000000000000000000000CC /* Inoxity/HealthKit/HealthKitCharacteristics.swift in Sources */,
+				B0000000000000000000000D /* Inoxity/Shared/Components/InoxityComponents.swift in Sources */,
+				B0000000000000000000000E /* Inoxity/Shared/DesignSystem/InoxityTheme.swift in Sources */,
+				B0000000000000000000000F /* Inoxity/Shared/Utilities/StudyCodeNormalizer.swift in Sources */,
+				B0000000000000000000001A /* Inoxity/Persistence/ParticipantState.swift in Sources */,
+				B0000000000000000000001B /* Inoxity/Persistence/ParticipantStatePersisting.swift in Sources */,
+				B0000000000000000000001C /* Inoxity/Persistence/UserDefaultsParticipantStateStore.swift in Sources */,
+				B0000000000000000000001E /* Inoxity/HealthKit/HealthKitModels.swift in Sources */,
+				B0000000000000000000001F /* Inoxity/HealthKit/HealthKitServicing.swift in Sources */,
+				B00000000000000000000020 /* Inoxity/HealthKit/HealthKitTypeRegistry.swift in Sources */,
+				B00000000000000000000021 /* Inoxity/HealthKit/HealthKitService.swift in Sources */,
+				B00000000000000000000022 /* Inoxity/HealthKit/MockHealthKitService.swift in Sources */,
+				B00000000000000000000027 /* Inoxity/Notifications/NotificationModels.swift in Sources */,
+				B00000000000000000000028 /* Inoxity/Notifications/NotificationServicing.swift in Sources */,
+				B00000000000000000000029 /* Inoxity/Notifications/NotificationService.swift in Sources */,
+				B0000000000000000000002A /* Inoxity/Notifications/MockNotificationService.swift in Sources */,
+				B0000000000000000000002B /* Inoxity/Notifications/NotificationScheduleBuilder.swift in Sources */,
+				B0000000000000000000002C /* Inoxity/Notifications/NotificationIdentifierFactory.swift in Sources */,
+				B0000000000000000000002D /* Inoxity/Notifications/NotificationRouting.swift in Sources */,
+				B0000000000000000000002E /* Inoxity/Notifications/SystemSettingsOpening.swift in Sources */,
+				B00000000000000000000050 /* Inoxity/Surveys/SurveyModels.swift in Sources */,
+				B00000000000000000000051 /* Inoxity/Surveys/SurveyRuntimePolicy.swift in Sources */,
+				B00000000000000000000052 /* Inoxity/Surveys/SurveyOccurrenceIdentifierFactory.swift in Sources */,
+				B00000000000000000000053 /* Inoxity/Surveys/SurveyOccurrenceBuilder.swift in Sources */,
+				B00000000000000000000054 /* Inoxity/Surveys/SurveyURLBuilder.swift in Sources */,
+				B00000000000000000000055 /* Inoxity/Surveys/SurveyCallbackParser.swift in Sources */,
+				B00000000000000000000056 /* Inoxity/Surveys/SurveyPresenting.swift in Sources */,
+				B00000000000000000000057 /* Inoxity/Surveys/SurveyPresenter.swift in Sources */,
+				B00000000000000000000058 /* Inoxity/Surveys/MockSurveyPresenter.swift in Sources */,
+				B00000000000000000000059 /* Inoxity/Features/Surveys/SurveysView.swift in Sources */,
+				B0000000000000000000005A /* Inoxity/Features/Surveys/SurveyOccurrenceCard.swift in Sources */,
+				B0000000000000000000005B /* Inoxity/Features/Surveys/InAppSurveyView.swift in Sources */,
+				B0000000000000000000005C /* Inoxity/Surveys/SurveyCompletionValidator.swift in Sources */,
+				B00000000000000000000070 /* Inoxity/Media/MediaModels.swift in Sources */,
+				B00000000000000000000071 /* Inoxity/Media/MediaValidator.swift in Sources */,
+				B00000000000000000000072 /* Inoxity/Media/MediaSelectionLoading.swift in Sources */,
+				B00000000000000000000073 /* Inoxity/Media/MediaLibraryImporter.swift in Sources */,
+				B00000000000000000000074 /* Inoxity/Media/MediaStoring.swift in Sources */,
+				B00000000000000000000075 /* Inoxity/Media/MediaStorage.swift in Sources */,
+				B00000000000000000000076 /* Inoxity/Media/MediaThumbnailGenerating.swift in Sources */,
+				B00000000000000000000077 /* Inoxity/Media/MediaThumbnailGenerator.swift in Sources */,
+				B00000000000000000000078 /* Inoxity/Media/MockMediaStorage.swift in Sources */,
+				B0000000000000000000007A /* Inoxity/Media/MediaRuntime.swift in Sources */,
+				B0000000000000000000007B /* Inoxity/Features/Media/MediaView.swift in Sources */,
+				B0000000000000000000007C /* Inoxity/Features/Media/MediaDraftCard.swift in Sources */,
+				B0000000000000000000007D /* Inoxity/Features/Media/MediaThumbnailView.swift in Sources */,
+				B000000000000000000000A0 /* Inoxity/Enrollment/SONAIDValidator.swift in Sources */,
+				B000000000000000000000A1 /* Inoxity/Withdrawal/WithdrawalModels.swift in Sources */,
+				B000000000000000000000A2 /* Inoxity/Withdrawal/WithdrawalEventPersisting.swift in Sources */,
+				B000000000000000000000A3 /* Inoxity/Withdrawal/UserDefaultsWithdrawalEventStore.swift in Sources */,
+				B000000000000000000000A4 /* Inoxity/Withdrawal/WithdrawalServicing.swift in Sources */,
+				B000000000000000000000A5 /* Inoxity/Withdrawal/WithdrawalRuntime.swift in Sources */,
+				B000000000000000000000A6 /* Inoxity/Features/Withdrawal/WithdrawalFlowView.swift in Sources */,
+				B000000000000000000000A7 /* Inoxity/HealthSummary/HealthSummaryModels.swift in Sources */,
+				B000000000000000000000A8 /* Inoxity/HealthSummary/HealthDataQuerying.swift in Sources */,
+				B000000000000000000000A9 /* Inoxity/HealthSummary/HealthSummaryProviding.swift in Sources */,
+				B000000000000000000000AA /* Inoxity/HealthSummary/HealthSummaryService.swift in Sources */,
+				B000000000000000000000AB /* Inoxity/HealthSummary/HealthKitHealthDataQueryService.swift in Sources */,
+				B000000000000000000000AC /* Inoxity/HealthSummary/MockHealthSummaryProvider.swift in Sources */,
+				B000000000000000000000AD /* Inoxity/Features/HealthSummary/SeeMyDataView.swift in Sources */,
+				B000000000000000000000AE /* Inoxity/Features/HealthSummary/HealthSummaryCard.swift in Sources */,
+				B000000000000000000000AF /* Inoxity/Notifications/NotificationDiagnostics.swift in Sources */,
+				B000000000000000000000B0 /* Inoxity/Features/Settings/NotificationDiagnosticsView.swift in Sources */,
+				B000000000000000000000B1 /* Inoxity/Backend/BackendModels.swift in Sources */,
+				B000000000000000000000B2 /* Inoxity/Backend/ParticipantAuthenticating.swift in Sources */,
+				B000000000000000000000B3 /* Inoxity/Backend/RemoteStudyRepository.swift in Sources */,
+				B000000000000000000000B4 /* Inoxity/Backend/RemoteEnrollmentRepository.swift in Sources */,
+				B000000000000000000000B5 /* Inoxity/Backend/RemoteWithdrawalRepository.swift in Sources */,
+				B000000000000000000000B6 /* Inoxity/Backend/HealthKitUploadRepository.swift in Sources */,
+				B000000000000000000000B7 /* Inoxity/Backend/SurveyCompletionUploadRepository.swift in Sources */,
+				B000000000000000000000B8 /* Inoxity/Backend/MediaUploadRepository.swift in Sources */,
+				B000000000000000000000B9 /* Inoxity/Sync/SyncCoordinating.swift in Sources */,
+				B000000000000000000000C5 /* Inoxity/HealthSummary/DailyHealthSummaryModels.swift in Sources */,
+				B000000000000000000000C6 /* Inoxity/Features/HealthSummary/DaySelectorHeader.swift in Sources */,
+				BA0000000000000000000001 /* Inoxity/Features/Main/HomeStatus.swift in Sources */,
+				BA0000000000000000000002 /* Inoxity/Features/Main/StudyProgress.swift in Sources */,
+				BA0000000000000000000003 /* Inoxity/Features/Main/DailyMessages.swift in Sources */,
+				BA0000000000000000000004 /* Inoxity/App/SplashView.swift in Sources */,
+				BC0100000000000000000001 /* Inoxity/Features/Main/ParticipantStartDateResolver.swift in Sources */,
+				BC0100000000000000000002 /* Inoxity/Features/Main/WaitingForStudyStartView.swift in Sources */,
+				BC0200000000000000000001 /* Inoxity/Configuration/RandomWindowScheduling.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		S00000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift in Sources */,
+				B3BT00000000000000000001 /* InoxityTests/Phase3BFoundationTests.swift in Sources */,
+				B00000000000000000000014 /* InoxityTests/StudyConfigurationTests.swift in Sources */,
+				B00000000000000000000015 /* InoxityTests/AppStateTests.swift in Sources */,
+				B0000000000000000000001D /* InoxityTests/ParticipantStateStoreTests.swift in Sources */,
+				B00000000000000000000024 /* InoxityTests/HealthKitTypeRegistryTests.swift in Sources */,
+				B00000000000000000000025 /* InoxityTests/HealthKitServiceTests.swift in Sources */,
+				B00000000000000000000026 /* InoxityTests/AppStateHealthKitTests.swift in Sources */,
+				B0000000000000000000002F /* InoxityTests/NotificationConfigurationTests.swift in Sources */,
+				B00000000000000000000030 /* InoxityTests/NotificationIdentifierFactoryTests.swift in Sources */,
+				B00000000000000000000031 /* InoxityTests/NotificationScheduleBuilderTests.swift in Sources */,
+				B00000000000000000000032 /* InoxityTests/NotificationServiceTests.swift in Sources */,
+				B00000000000000000000033 /* InoxityTests/AppStateNotificationTests.swift in Sources */,
+				B00000000000000000000034 /* InoxityTests/NotificationRoutingTests.swift in Sources */,
+				B00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift in Sources */,
+				B00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift in Sources */,
+				B00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift in Sources */,
+				B00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift in Sources */,
+				B00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift in Sources */,
+				B00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift in Sources */,
+				B00000000000000000000066 /* InoxityTests/SurveyNotificationRoutingIntegrationTests.swift in Sources */,
+				B00000000000000000000067 /* InoxityTests/AppStateSurveyTests.swift in Sources */,
+				B00000000000000000000068 /* InoxityTests/SurveyCompletionValidatorTests.swift in Sources */,
+				B00000000000000000000080 /* InoxityTests/MediaConfigurationTests.swift in Sources */,
+				B000000000000000000000C8 /* InoxityTests/AppStateMediaUploadTests.swift in Sources */,
+				B00000000000000000000082 /* InoxityTests/MediaStorageTests.swift in Sources */,
+				B00000000000000000000083 /* InoxityTests/MediaRuntimeTests.swift in Sources */,
+				B00000000000000000000084 /* InoxityTests/MediaPersistenceMigrationTests.swift in Sources */,
+				B000000000000000000000C0 /* InoxityTests/SONAIDValidatorTests.swift in Sources */,
+				B000000000000000000000C1 /* InoxityTests/HealthSummaryServiceTests.swift in Sources */,
+				B000000000000000000000C2 /* InoxityTests/WithdrawalRuntimeTests.swift in Sources */,
+				B000000000000000000000C3 /* InoxityTests/NotificationReliabilityTests.swift in Sources */,
+				B000000000000000000000C4 /* InoxityTests/ParticipantStatePhase3MigrationTests.swift in Sources */,
+				B000000000000000000000C7 /* InoxityTests/DaySelectorHeaderTests.swift in Sources */,
+				BA0000000000000000000005 /* InoxityTests/StudyProgressTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D00000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = T00000000000000000000001 /* Inoxity */;
+			targetProxy = C00000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		Q00000000000000000000001 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000001 /* Config/Development.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Development;
+		};
+		Q00000000000000000000002 /* Production */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000003 /* Config/Production.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Production;
+		};
+		Q00000000000000000000003 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000001 /* Config/Development.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Inoxity/Inoxity.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47N4Y9XDDT;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Inoxity/Info.plist;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.cogcommscience.Inoxity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Development;
+		};
+		Q00000000000000000000004 /* Production */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000003 /* Config/Production.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Inoxity/Inoxity.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47N4Y9XDDT;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Inoxity/Info.plist;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.cogcommscience.Inoxity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Production;
+		};
+		Q00000000000000000000005 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000001 /* Config/Development.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47N4Y9XDDT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.cogcommscience.InoxityTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Inoxity.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Inoxity";
+			};
+			name = Development;
+		};
+		Q00000000000000000000006 /* Production */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000003 /* Config/Production.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47N4Y9XDDT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.cogcommscience.InoxityTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Inoxity.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Inoxity";
+			};
+			name = Production;
+		};
+		Q3B000000000000000000001 /* Staging */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000002 /* Config/Staging.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Staging;
+		};
+		Q3B000000000000000000002 /* Staging */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000002 /* Config/Staging.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Inoxity/Inoxity.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47N4Y9XDDT;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Inoxity/Info.plist;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.cogcommscience.Inoxity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Staging;
+		};
+		Q3B000000000000000000003 /* Staging */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3BC00000000000000000002 /* Config/Staging.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47N4Y9XDDT;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.cogcommscience.InoxityTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Inoxity.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Inoxity";
+			};
+			name = Staging;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		L00000000000000000000001 /* Build configuration list for PBXProject "Inoxity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				Q00000000000000000000001 /* Development */,
+				Q3B000000000000000000001 /* Staging */,
+				Q00000000000000000000002 /* Production */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Production;
+		};
+		L00000000000000000000002 /* Build configuration list for PBXNativeTarget "Inoxity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				Q00000000000000000000003 /* Development */,
+				Q3B000000000000000000002 /* Staging */,
+				Q00000000000000000000004 /* Production */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Production;
+		};
+		L00000000000000000000003 /* Build configuration list for PBXNativeTarget "InoxityTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				Q00000000000000000000005 /* Development */,
+				Q3B000000000000000000003 /* Staging */,
+				Q00000000000000000000006 /* Production */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Production;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		PKG3B0000000000000000001 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 2.46.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		SP3B00000000000000000001 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = PKG3B0000000000000000001 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = P00000000000000000000001 /* Project object */;
+}

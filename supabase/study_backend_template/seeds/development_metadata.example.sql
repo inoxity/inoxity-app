@@ -1,0 +1,7 @@
+-- STUDY DATA BACKEND ONLY
+-- ================================================================
+-- DEVELOPMENT SEED ONLY — copy privately and replace every placeholder.
+-- Apply to exactly one disposable Development Study Backend.
+-- ================================================================
+-- insert into public.study_backend_metadata(backend_instance_id,stable_study_id,expected_study_code,supported_configuration_schema_version,is_active)
+-- values('REPLACE_WITH_CONTROL_DESCRIPTOR_UUID','REPLACE_STABLE_ID','REPLACE_CODE',5,true);

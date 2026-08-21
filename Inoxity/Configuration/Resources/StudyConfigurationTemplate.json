@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 5,
+  "identity": { "id": "", "code": "", "displayName": "", "shortName": "", "welcomeTitle": "", "welcomeMessage": "" },
+  "status": { "state": "inactive", "message": "Template only" },
+  "schedule": { "startDate": null, "endDate": null, "timeZone": "UTC", "openEnded": true },
+  "participantID": { "label": "Participant ID", "prompt": "Enter your participant ID", "placeholder": "", "helpText": "", "required": true, "minimumLength": 1, "maximumLength": 64, "allowedPattern": null },
+  "onboarding": { "pages": [] },
+  "healthKit": { "enabled": false, "rationale": "Development fixture: explain that only configured types are read; local See My Data summaries stay on-device; configured samples may be sent only to the verified Study Backend; Inoxity never writes to Apple Health; deleted samples are not yet mirrored remotely.", "identifiers": [] },
+  "notifications": { "enabled": false, "rationale": "Optional reminders can help participants remember study activities." },
+  "surveys": [{ "id": "example-survey", "enabled": false, "name": "Example survey", "description": "Participant-facing survey description.", "url": "https://example.edu/survey", "presentationMode": "externalBrowser", "schedule": { "pattern": "daily", "date": null, "hour": 9, "minute": 0, "weekdays": [] }, "availabilityWindow": { "opensMinutesBefore": 30, "closesMinutesAfter": 60 }, "completionCallback": { "enabled": true }, "instructions": null, "privacyText": "Inoxity does not store survey responses.", "activeStartDate": null, "activeEndDate": null }],
+  "reminders": [{ "id": "example-reminder", "title": "Inoxity reminder", "body": "An Inoxity activity is available.", "enabled": false, "kind": "survey", "surveyID": "example-survey", "notifyMinutesBefore": 0, "destination": "surveys", "activeStartDate": null, "activeEndDate": null }],
+  "features": { "surveysEnabled": false, "sleepSummaryEnabled": false, "mediaUploadsEnabled": false, "streaksEnabled": false, "visibleTabs": ["home", "about", "settings"] },
+  "media": { "enabled": false, "instructions": "Development fixture: describe what to select and upload.", "privacyText": "Selected media is uploaded directly to this study's secure server and is not kept on this device afterward.", "acceptedTypes": [], "maximumTotalItems": 1, "maximumFileSizeMB": 25, "maximumVideoLengthSeconds": null, "required": false, "activeStartDate": null, "activeEndDate": null, "categories": [] },
+  "support": { "name": "", "email": "support@example.edu", "phone": null, "website": null },
+  "faqs": [],
+  "completion": { "title": "", "message": "", "redirectURL": null, "appAccessRemainsAvailable": true }
+}

@@ -1,0 +1,8 @@
+-- CONTROL BACKEND ONLY
+-- ================================================================
+-- DEVELOPMENT SEED ONLY — placeholders for inoxity_backend.
+-- Replace locally; never commit live URLs or public keys.
+-- ================================================================
+-- Insert one study_backends row per independent Study Backend, then insert
+-- a studies row referencing it. Configuration JSON must exactly match the app schema.
+-- No executable placeholder insert is supplied to prevent accidental deployment.

@@ -1,0 +1,4 @@
+-- ARCHIVED HISTORICAL SQL — DO NOT APPLY
+-- Original single-backend structural/RLS verification outline.
+-- It expected studies, participants, study_enrollments, and withdrawal_requests
+-- to coexist in one Supabase project and is incompatible with the active topology.

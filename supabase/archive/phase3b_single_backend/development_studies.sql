@@ -1,0 +1,4 @@
+-- ARCHIVED HISTORICAL SQL — DO NOT APPLY
+-- Original single-backend Development seed outline. Live credentials were never stored here.
+-- The former seed inserted SLEEP01 and ACTIVITY02 configuration rows into public.studies.
+-- Use the active control_backend seed documentation for all new V2 deployments.

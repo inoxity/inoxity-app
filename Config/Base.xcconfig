@@ -1,0 +1,11 @@
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+SWIFT_VERSION = 5.0
+INOXITY_CONTROL_SUPABASE_URL =
+INOXITY_CONTROL_SUPABASE_ANON_KEY =
+// "Contact the research team" (ContactService.swift) relays a message to
+// the dashboard's /api/contact route, which emails the study's support
+// contact — see inoxity-dashboard/src/app/api/contact/route.ts. Both empty
+// by default; the feature just stays hidden/unavailable until set (see
+// Secrets.example.xcconfig for where real values come from).
+INOXITY_CONTACT_ENDPOINT_URL =
+INOXITY_CONTACT_SHARED_SECRET =

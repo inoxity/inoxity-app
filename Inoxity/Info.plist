@@ -12,13 +12,14 @@
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
   <key>CFBundleName</key><string>$(PRODUCT_NAME)</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.0</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleShortVersionString</key><string>$(MARKETING_VERSION)</string>
+  <key>CFBundleVersion</key><string>$(CURRENT_PROJECT_VERSION)</string>
   <key>CFBundleURLTypes</key><array><dict>
     <key>CFBundleURLName</key><string>org.inoxity.survey-callback</string>
     <key>CFBundleURLSchemes</key><array><string>inoxity</string></array>
   </dict></array>
   <key>NSHealthShareUsageDescription</key><string>Inoxity reads the Apple Health data requested by your active study to show local summaries and securely provide configured research data to that study.</string>
+  <key>NSHealthUpdateUsageDescription</key><string>Inoxity does not write any data to Apple Health. This permission is required by the HealthKit framework but is not used by the app.</string>
   <key>UILaunchScreen</key><dict>
     <key>UIColorName</key><string>LaunchBackground</string>
     <key>UIImageName</key><string>InoxityBrandmark</string>

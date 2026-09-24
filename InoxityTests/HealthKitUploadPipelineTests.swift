@@ -115,6 +115,21 @@ final class HealthKitUploadPipelineTests: XCTestCase {
         let records = await queue.records(studyID: "study"), cursor = await cursors.cursor(for: cursorKey()), submissions = await repo.submissions()
         XCTAssertTrue(records.isEmpty); XCTAssertNotNil(cursor?.committedAnchor); XCTAssertEqual(submissions, 0)
     }
+    func testSynchronizeDrainsAllAvailableQueryPages() async throws {
+        let defaults = temporaryDefaults(); let queue = UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-pages")
+        let cursors = UserDefaultsHealthKitSyncCursorStore(defaults: defaults, key: "c-pages")
+        let query = PagedRawQuery(pages: [
+            .init(samples: [], nextAnchor: Data([1]), hasMore: true, ignoredDeletionCount: 1),
+            .init(samples: [], nextAnchor: Data([2]), hasMore: false, ignoredDeletionCount: 1)
+        ])
+        let coordinator = HealthKitUploadCoordinator(query: query, queue: queue, cursors: cursors)
+        _ = await coordinator.synchronize(state: participant(), configuration: try await configuration(), repository: MockHealthRepository(acknowledge: true))
+        let cursor = await cursors.cursor(for: cursorKey())
+        let callCount = await query.callCount()
+        XCTAssertEqual(callCount, 2)
+        XCTAssertEqual(cursor?.committedAnchor, Data([2]))
+        XCTAssertNil(cursor?.candidateAnchor)
+    }
     func testPolicyIsCentralizedAndBounded() {
         XCTAssertEqual(HealthKitUploadPolicy.phase3D.initialHistoryDays, 30)
         XCTAssertEqual(HealthKitUploadPolicy.phase3D.maximumQueryPageSize, 250)
@@ -215,6 +230,16 @@ private struct MockRawQuery: HealthKitSampleQuerying {
     func query(identifier: String, start: Date, end: Date, anchor: Data?, limit: Int) async throws -> HealthKitSampleQueryPage {
         .init(samples: samples, nextAnchor: Data([9]), hasMore: false, ignoredDeletionCount: deleted)
     }
+}
+private actor PagedRawQuery: HealthKitSampleQuerying {
+    let pages: [HealthKitSampleQueryPage]
+    private var index = 0
+    init(pages: [HealthKitSampleQueryPage]) { self.pages = pages }
+    func query(identifier: String, start: Date, end: Date, anchor: Data?, limit: Int) async throws -> HealthKitSampleQueryPage {
+        defer { index += 1 }
+        return pages[min(index, pages.count - 1)]
+    }
+    func callCount() -> Int { index }
 }
 // Records the `start` date `HealthKitUploadCoordinator.collectionStart` actually computed and
 // passed into the first query for the identifier under test — used by Workstream C's backfill

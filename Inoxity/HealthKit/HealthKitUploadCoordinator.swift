@@ -37,15 +37,20 @@ actor HealthKitUploadCoordinator: HealthKitUploadCoordinating {
                 let end = collectionEnd(configuration: configuration, now: now())
                 let start = collectionStart(state: state, configuration: configuration, end: end)
                 guard start < end else { continue }
-                let page = try await query.query(identifier: identifier, start: start, end: end,
-                                                 anchor: cursor.committedAnchor, limit: policy.maximumQueryPageSize)
-                let normalized = try page.samples.map { try HealthKitSampleNormalizer.normalize($0, participant: state, now: now()) }
-                try await queue.enqueue(normalized)
-                cursor.candidateAnchor = page.nextAnchor; cursor.candidateRequiredSampleIDs = normalized.map(\.clientSampleID)
-                cursor.lastQueryAttempt = now(); cursor.status = .awaitingAcknowledgments; try await cursors.save(cursor)
-                let uploaded = await uploadQueued(studyID: state.studyID, repository: repository)
-                counters = Self.add(counters, uploaded)
-                if await candidateAcknowledged(cursor) { try await promote(&cursor) }
+                var hasMore = true
+                while hasMore {
+                    let page = try await query.query(identifier: identifier, start: start, end: end,
+                                                     anchor: cursor.committedAnchor, limit: policy.maximumQueryPageSize)
+                    let normalized = try page.samples.map { try HealthKitSampleNormalizer.normalize($0, participant: state, now: now()) }
+                    try await queue.enqueue(normalized)
+                    cursor.candidateAnchor = page.nextAnchor; cursor.candidateRequiredSampleIDs = normalized.map(\.clientSampleID)
+                    cursor.lastQueryAttempt = now(); cursor.status = .awaitingAcknowledgments; try await cursors.save(cursor)
+                    let uploaded = await uploadQueued(studyID: state.studyID, repository: repository)
+                    counters = Self.add(counters, uploaded)
+                    guard await candidateAcknowledged(cursor) else { break }
+                    try await promote(&cursor)
+                    hasMore = page.hasMore
+                }
             } catch {
                 counters = .init(attempted: counters.attempted + 1, succeeded: counters.succeeded,
                                  retryableFailures: counters.retryableFailures + (Self.retryable(error) ? 1 : 0),

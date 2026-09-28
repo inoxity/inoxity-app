@@ -10,6 +10,17 @@ enum SupabaseBackendErrorMapper {
         if text.contains("unauthorized") || text.contains("authentication required") || text.contains("jwt") { return .unauthorized }
         return .unavailable
     }
+    /// Matches the RPC's own `raise exception` messages (plus the per-row check constraints and
+    /// casts in 005) — deliberately NOT a missing-table error, which is a whole-metric setup
+    /// problem that stays retryable until the backend SQL is fixed.
+    static func healthKitSampleRejection(_ error: Error) -> HealthKitUploadError? {
+        let text = String(describing: error).lowercased()
+        if text.contains("conflicting duplicate identity") || text.contains("conflicting_duplicate_identity") { return .conflictingDuplicate }
+        let invalid = ["invalid quantity sample", "invalid category sample", "invalid sleep sample", "invalid workout sample",
+                       "invalid correlation sample", "unsupported identifier", "invalid batch size",
+                       "violates check constraint", "invalid input syntax"]
+        return invalid.contains(where: text.contains) ? .invalidSample : nil
+    }
 }
 
 enum SupabaseClientFactory {
@@ -404,6 +415,11 @@ private actor BoundSupabaseStudyRepository: StudyBackendClientProviding, StudyBa
         } catch let error as HealthKitUploadError { throw error }
         catch let error as BackendError { throw error }
         catch {
+            // Sample-level rejections from submit_healthkit_samples (006) must not look retryable:
+            // retrying the identical batch fails identically forever and stalls every metric's
+            // cursor behind it. Surfacing them as non-retryable lets the coordinator bisect the
+            // batch and set aside only the offending sample(s).
+            if let rejection = SupabaseBackendErrorMapper.healthKitSampleRejection(error) { throw rejection }
             let mapped = SupabaseBackendErrorMapper.mapStudyBackend(error)
             if mapped == .inactiveBackend { throw mapped }
             throw HealthKitUploadError.unavailable

@@ -1,6 +1,7 @@
 import SwiftUI
 
 @main struct InoxityApp: App {
+    @UIApplicationDelegateAdaptor(InoxityAppDelegate.self) private var appDelegate
     @StateObject private var appState = AppState(container: .live)
     @Environment(\.scenePhase) private var scenePhase
     var body: some Scene {
@@ -20,5 +21,16 @@ import SwiftUI
                 }
         }
         .onChange(of: scenePhase) { _, phase in if phase == .active { Task { await appState.applicationDidBecomeActive() } } }
+    }
+}
+
+/// HealthKit requires observer queries to be re-registered in didFinishLaunching on every launch —
+/// including background launches HealthKit itself triggers to deliver new samples, where the
+/// SwiftUI view tree (and so AppState) may never be built. See HealthKitBackgroundDelivery.
+final class InoxityAppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        AppContainer.live.healthKitBackgroundDelivery?.resumePersistedObservation()
+        return true
     }
 }

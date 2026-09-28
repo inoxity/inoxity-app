@@ -41,6 +41,11 @@ struct HealthKitSampleUpload: Codable, Equatable, Identifiable, Sendable {
     var failureCategory: BackendFailureCategory?
     var acknowledgedAt: Date?
     var remoteAcknowledgmentID: UUID?
+    /// True once the Study Backend rejected this exact sample on its own (after bisecting its
+    /// batch) — it's then excluded from further uploads and no longer blocks its metric's cursor.
+    /// Optional so queues persisted before this field existed still decode; a legacy
+    /// `.attentionRequired` record (nil here) gets one more isolated attempt.
+    var setAsideAfterRejection: Bool? = nil
 }
 
 struct HealthKitRawSample: Equatable, Sendable {

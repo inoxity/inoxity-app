@@ -21,14 +21,15 @@ final class AppState: ObservableObject {
     private let studyBackendClientFactory: (any StudyBackendClientFactory)?
     private let installationID: any InstallationIdentifying
     private let syncCoordinator: (any SyncCoordinating)?
+    private let healthKitBackgroundDelivery: (any HealthKitBackgroundDelivering)?
     private let backendEnvironment: BackendEnvironment?
     // Direct, one-off StudyBackendContext resolution for an already-enrolled participant —
     // used by uploadMediaDraft, mirroring how studyBackendClientFactory above is already used
     // directly (not via syncCoordinator) for the pre-enrollment registerParticipantID call.
     private let router: (any StudyBackendRouting)?
 
-    @Published private(set) var configuration: StudyConfiguration?
-    @Published private(set) var participantState: ParticipantState?
+    @Published private(set) var configuration: StudyConfiguration? { didSet { refreshHealthKitBackgroundDelivery() } }
+    @Published private(set) var participantState: ParticipantState? { didSet { refreshHealthKitBackgroundDelivery() } }
     @Published private(set) var isRestoring = true
     @Published private(set) var persistenceError: ParticipantStatePersistenceError?
     @Published private(set) var healthKitStatus: HealthKitRuntimeStatus = .notRequested
@@ -127,6 +128,7 @@ final class AppState: ObservableObject {
         studyBackendClientFactory = container.studyBackendClientFactory
         installationID = container.installationID
         syncCoordinator = container.syncCoordinator
+        healthKitBackgroundDelivery = container.healthKitBackgroundDelivery
         backendEnvironment = container.backendEnvironment
         router = container.router
         // Wired synchronously here, not from a SwiftUI `.task` — on a cold launch triggered by
@@ -376,6 +378,7 @@ final class AppState: ObservableObject {
         do { event = try await withdrawalService.withdraw(participantState, choice: choice) }
         catch { withdrawalErrorMessage = message(for: error); return .failed }
         clearActiveEnrollmentRuntime(); withdrawalFlowPresented = false
+        healthKitBackgroundDelivery?.observe(identifiers: [])
         // The real sync keeps running in the background regardless of whether the bounded wait
         // below times out — it is NOT the thing being raced/cancelled, so a slow-but-eventually-
         // successful sync still completes even after this function returns.
@@ -960,6 +963,19 @@ final class AppState: ObservableObject {
         stateStore.setActiveStudyCode(configuration.identity.code)
         stateStore.clearLegacyEnrollment()
         return migrated
+    }
+
+    /// Keeps HealthKit background delivery in step with whether this participant's Apple Health
+    /// data can actually sync — the same gates HealthKitUploadCoordinator.synchronize applies.
+    /// Skipped while either value is nil: that's a launch still restoring (configuration and
+    /// participantState are assigned one after the other) and must not switch off the observers
+    /// the app delegate already resumed. Withdrawal stops them explicitly instead.
+    private func refreshHealthKitBackgroundDelivery() {
+        guard let healthKitBackgroundDelivery, let configuration, let participantState else { return }
+        let eligible = configuration.healthKit.enabled && participantState.participationStatus == .enrolled
+            && participantState.healthKitRequestState == .requestCompleted
+            && participantState.enrollmentSyncStatus == .registered && participantState.backendRoutingStatus == .registered
+        healthKitBackgroundDelivery.observe(identifiers: eligible ? configuration.healthKit.identifiers : [])
     }
 
     private func updateParticipantState(_ mutation: (inout ParticipantState) -> Void) {

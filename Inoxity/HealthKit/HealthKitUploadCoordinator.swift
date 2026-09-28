@@ -34,7 +34,7 @@ actor HealthKitUploadCoordinator: HealthKitUploadCoordinating {
                     if await candidateAcknowledged(cursor) { try await promote(&cursor) }
                     else { continue }
                 }
-                let end = collectionEnd(configuration: configuration, now: now())
+                let end = collectionEnd(state: state, configuration: configuration, now: now())
                 let start = collectionStart(state: state, configuration: configuration, end: end)
                 guard start < end else { continue }
                 var hasMore = true
@@ -174,19 +174,33 @@ actor HealthKitUploadCoordinator: HealthKitUploadCoordinating {
         // backfill days were configured.
         return [history, studyStart].compactMap { $0 }.max() ?? history
     }
-    private func collectionEnd(configuration: StudyConfiguration, now: Date) -> Date {
-        [now, Self.parse(configuration.schedule.endDate)].compactMap { $0 }.min() ?? now
+    /// No sample recorded after the study is over is collected: the window ends at the earliest of
+    /// now, the end of the study-wide `endDate`, and the end of this participant's own last day
+    /// (`participantDurationDays`, the same boundary that stops reminders and shows the completion
+    /// screen). Samples recorded before the end but synced to HealthKit later, e.g. by a watch,
+    /// still upload. Computed in the phone's current zone, like the reminder schedule.
+    private func collectionEnd(state: ParticipantState, configuration: StudyConfiguration, now: Date) -> Date {
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = .current
+        let studyEnd = Self.endOfDay(configuration.schedule.endDate, calendar: calendar)
+        let durationEnd = StudyProgress.participantCollectionEnd(
+            startDate: ParticipantStartDateResolver.resolve(schedule: configuration.schedule, participant: state, calendar: calendar),
+            participantDurationDays: configuration.schedule.participantDurationDays, calendar: calendar)
+        return [now, studyEnd, durationEnd].compactMap { $0 }.min() ?? now
     }
-    // NOTE (found while implementing Workstream C, deliberately NOT fixed here — see
-    // conversation): `schedule.startDate`/`.endDate` are plain "yyyy-MM-dd" strings everywhere
-    // in this codebase (see `StudyConfigurationValidator.dateFormatter`), but `ISO8601DateFormatter`
-    // cannot parse date-only strings (verified: returns nil for "2025-01-01"). That means
-    // `Self.parse(configuration.schedule.startDate)`/`.endDate` below silently return nil today,
-    // so `schedule.startDate`/`.endDate` never actually bound anything in this file — a
-    // separate, pre-existing bug from the one this workstream fixes. Left as-is because fixing
-    // it changes `collectionEnd`'s real bound too and has ripple effects on existing tests that
-    // use unrealistic `now` fixtures relying on that bound being a no-op; flagged for a
-    // follow-up fix rather than folded silently into this change.
+    /// The last moment of a plain "yyyy-MM-dd" schedule date (the format `StudyConfigurationValidator`
+    /// enforces).
+    private static func endOfDay(_ value: String?, calendar: Calendar) -> Date? {
+        let parts = value?.split(separator: "-").compactMap { Int($0) } ?? []
+        guard parts.count == 3, let start = calendar.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2])),
+              let next = calendar.date(byAdding: .day, value: 1, to: start) else { return nil }
+        return next.addingTimeInterval(-1)
+    }
+    // NOTE (found while implementing Workstream C, still NOT fixed for the start date):
+    // `schedule.startDate` is a plain "yyyy-MM-dd" string, which `ISO8601DateFormatter` can't parse
+    // (it returns nil for "2025-01-01"), so `Self.parse(configuration.schedule.startDate)` in
+    // `collectionStart` silently never bounds the backfill window. Fixing that would change how
+    // far back backfill reaches, so it's left for a deliberate follow-up. The END date has its
+    // own correct parser above (`endOfDay`).
     private static func parse(_ value: String?) -> Date? {
         guard let value else { return nil }; return ISO8601DateFormatter().date(from: value)
     }

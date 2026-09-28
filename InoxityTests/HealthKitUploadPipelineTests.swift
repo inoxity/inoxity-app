@@ -208,6 +208,19 @@ final class HealthKitUploadPipelineTests: XCTestCase {
         try await reloaded.reset(studyID: "study")
         let cleared = await reloaded.diagnostics(studyID: "study"); XCTAssertEqual(cleared, .empty)
     }
+    func testNoSampleRecordedAfterTheParticipantsLastStudyDayIsCollected() async throws {
+        let defaults = temporaryDefaults(), capture = CapturingQuery()
+        let enrolled = Date(timeIntervalSince1970: 1_790_000_000), now = enrolled.addingTimeInterval(30 * 86_400)
+        let coordinator = HealthKitUploadCoordinator(query: capture, queue: UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-end"),
+                                                     cursors: UserDefaultsHealthKitSyncCursorStore(defaults: defaults, key: "c-end"), now: { now })
+        let config = try await configuration(schemaVersion: 7, backfillDays: 30, participantDurationDays: 3)
+        _ = await coordinator.synchronize(state: participant(enrollmentDate: enrolled), configuration: config,
+                                          repository: MockHealthRepository(acknowledge: true))
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = .current
+        let expected = try XCTUnwrap(StudyProgress.participantCollectionEnd(startDate: enrolled, participantDurationDays: 3, calendar: calendar))
+        let end = await capture.lastEnd
+        XCTAssertEqual(end, expected, "the query window must stop at the end of the participant's last day, not now")
+    }
     func testBackendSampleRejectionsMapToNonRetryableErrors() {
         struct ServerError: Error, CustomStringConvertible { let description: String }
         XCTAssertEqual(SupabaseBackendErrorMapper.healthKitSampleRejection(ServerError(description: "PostgrestError(message: \"invalid quantity sample\")")), .invalidSample)
@@ -301,13 +314,17 @@ final class HealthKitUploadPipelineTests: XCTestCase {
     // Loads ActivityStudy.json (schedule.startDate == 2025-01-01) and overrides schemaVersion /
     // healthKit.backfillDays directly in the raw JSON before decoding, for testing Workstream
     // C's per-study backfill window without needing a dedicated fixture file per case.
-    private func configuration(schemaVersion: Int, backfillDays: Int?) async throws -> StudyConfiguration {
+    private func configuration(schemaVersion: Int, backfillDays: Int?, participantDurationDays: Int? = nil) async throws -> StudyConfiguration {
         let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "ActivityStudy", withExtension: "json"))
         var root = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
         root["schemaVersion"] = schemaVersion
         var healthKit = try XCTUnwrap(root["healthKit"] as? [String: Any])
         healthKit["backfillDays"] = backfillDays ?? NSNull()
         root["healthKit"] = healthKit
+        if let participantDurationDays {
+            var schedule = try XCTUnwrap(root["schedule"] as? [String: Any])
+            schedule["participantDurationDays"] = participantDurationDays; root["schedule"] = schedule
+        }
         return try JSONDecoder().decode(StudyConfiguration.self, from: JSONSerialization.data(withJSONObject: root))
     }
     private func temporaryDefaults() -> UserDefaults { let suite = "hk-upload-\(UUID())"; let value = UserDefaults(suiteName: suite)!; value.removePersistentDomain(forName: suite); return value }
@@ -356,8 +373,9 @@ private actor PagedRawQuery: HealthKitSampleQuerying {
 // window tests, which care about that value rather than any returned samples.
 private actor CapturingQuery: HealthKitSampleQuerying {
     private(set) var lastStart: Date?
+    private(set) var lastEnd: Date?
     func query(identifier: String, start: Date, end: Date, anchor: Data?, limit: Int) async throws -> HealthKitSampleQueryPage {
-        lastStart = start
+        lastStart = start; lastEnd = end
         return .init(samples: [], nextAnchor: Data([9]), hasMore: false, ignoredDeletionCount: 0)
     }
 }

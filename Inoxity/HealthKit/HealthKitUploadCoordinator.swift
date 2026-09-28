@@ -174,18 +174,28 @@ actor HealthKitUploadCoordinator: HealthKitUploadCoordinating {
         // backfill days were configured.
         return [history, studyStart].compactMap { $0 }.max() ?? history
     }
-    /// No sample recorded after the study is over is collected: the window ends at the earliest of
-    /// now, the end of the study-wide `endDate`, and the end of this participant's own last day
-    /// (`participantDurationDays`, the same boundary that stops reminders and shows the completion
-    /// screen). Samples recorded before the end but synced to HealthKit later, e.g. by a watch,
-    /// still upload. Computed in the phone's current zone, like the reminder schedule.
+    /// How long after the study's last day Apple Health samples are still collected: until noon
+    /// the next day, so the final night of sleep (and overnight heart rate, HRV, etc.) is captured
+    /// whole instead of being cut at midnight. Reminders and surveys get no grace period.
+    static let postStudyGraceHours = 12
+
+    /// The collection window ends at the earliest of now and the study's end plus
+    /// `postStudyGraceHours`. The study's end is the earlier of the study-wide `endDate` and the end
+    /// of this participant's own last day (`participantDurationDays`, the same boundary that stops
+    /// reminders and shows the completion screen). A sample counts if it STARTS before the window
+    /// ends. Samples recorded in time but synced to HealthKit later, e.g. by a watch, still upload.
+    /// Computed in the phone's current zone, like the reminder schedule.
     private func collectionEnd(state: ParticipantState, configuration: StudyConfiguration, now: Date) -> Date {
         var calendar = Calendar(identifier: .gregorian); calendar.timeZone = .current
         let studyEnd = Self.endOfDay(configuration.schedule.endDate, calendar: calendar)
         let durationEnd = StudyProgress.participantCollectionEnd(
             startDate: ParticipantStartDateResolver.resolve(schedule: configuration.schedule, participant: state, calendar: calendar),
             participantDurationDays: configuration.schedule.participantDurationDays, calendar: calendar)
-        return [now, studyEnd, durationEnd].compactMap { $0 }.min() ?? now
+        guard let lastMoment = [studyEnd, durationEnd].compactMap({ $0 }).min() else { return now }
+        // lastMoment is 23:59:59 on the last day, so one second later is midnight starting the next.
+        let dayAfter = lastMoment.addingTimeInterval(1)
+        let graceEnd = calendar.date(byAdding: .hour, value: Self.postStudyGraceHours, to: dayAfter) ?? lastMoment
+        return min(now, graceEnd)
     }
     /// The last moment of a plain "yyyy-MM-dd" schedule date (the format `StudyConfigurationValidator`
     /// enforces).

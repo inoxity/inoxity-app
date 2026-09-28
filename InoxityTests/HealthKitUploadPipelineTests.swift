@@ -208,7 +208,7 @@ final class HealthKitUploadPipelineTests: XCTestCase {
         try await reloaded.reset(studyID: "study")
         let cleared = await reloaded.diagnostics(studyID: "study"); XCTAssertEqual(cleared, .empty)
     }
-    func testNoSampleRecordedAfterTheParticipantsLastStudyDayIsCollected() async throws {
+    func testCollectionStopsAtNoonAfterTheParticipantsLastStudyDay() async throws {
         let defaults = temporaryDefaults(), capture = CapturingQuery()
         let enrolled = Date(timeIntervalSince1970: 1_790_000_000), now = enrolled.addingTimeInterval(30 * 86_400)
         let coordinator = HealthKitUploadCoordinator(query: capture, queue: UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-end"),
@@ -217,9 +217,12 @@ final class HealthKitUploadPipelineTests: XCTestCase {
         _ = await coordinator.synchronize(state: participant(enrollmentDate: enrolled), configuration: config,
                                           repository: MockHealthRepository(acknowledge: true))
         var calendar = Calendar(identifier: .gregorian); calendar.timeZone = .current
-        let expected = try XCTUnwrap(StudyProgress.participantCollectionEnd(startDate: enrolled, participantDurationDays: 3, calendar: calendar))
+        let lastMoment = try XCTUnwrap(StudyProgress.participantCollectionEnd(startDate: enrolled, participantDurationDays: 3, calendar: calendar))
+        // Noon the day after the last study day, so the final night of sleep is captured whole.
+        let expected = try XCTUnwrap(calendar.date(byAdding: .hour, value: 12, to: lastMoment.addingTimeInterval(1)))
+        XCTAssertEqual(calendar.component(.hour, from: expected), 12)
         let end = await capture.lastEnd
-        XCTAssertEqual(end, expected, "the query window must stop at the end of the participant's last day, not now")
+        XCTAssertEqual(end, expected, "the query window must stop at noon after the participant's last day, not now")
     }
     func testBackendSampleRejectionsMapToNonRetryableErrors() {
         struct ServerError: Error, CustomStringConvertible { let description: String }

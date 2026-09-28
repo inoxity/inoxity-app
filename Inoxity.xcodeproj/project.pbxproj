@@ -159,6 +159,7 @@
 		BD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */; };
 		BD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */; };
 		BD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */; };
+		BD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift */; };
 		BD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */; };
 		BD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift */; };
 		BFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift */; };
@@ -331,6 +332,7 @@
 		FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitSampleQuerying.swift; sourceTree = SOURCE_ROOT; };
 		FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitUploadPersistence.swift; sourceTree = SOURCE_ROOT; };
 		FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitUploadCoordinator.swift; sourceTree = SOURCE_ROOT; };
+		FD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitBackgroundDelivery.swift; sourceTree = SOURCE_ROOT; };
 		FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift; sourceTree = SOURCE_ROOT; };
 		FD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/HealthKitUploadPipelineTests.swift; sourceTree = SOURCE_ROOT; };
 		FFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/StudyConfigurationFuzzTests.swift; sourceTree = SOURCE_ROOT; };
@@ -364,6 +366,7 @@
 				FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */,
 				FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */,
 				FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */,
+				FD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift */,
 				FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */,
 				F3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift */,
 				F3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift */,
@@ -669,6 +672,7 @@
 				BD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift in Sources */,
 				BD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift in Sources */,
 				BD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift in Sources */,
+				BD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift in Sources */,
 				BD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift in Sources */,
 				B3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift in Sources */,
 				B3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift in Sources */,

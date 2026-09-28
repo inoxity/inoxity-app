@@ -25,6 +25,9 @@ struct AppContainer {
     // mirroring the existing studyBackendClientFactory pattern already used the same way for
     // registerParticipantID's direct enrollment call.
     let router: (any StudyBackendRouting)?
+    // Wakes the app to upload new Apple Health samples in the background (nil in tests and in
+    // builds without a backend environment, where there is nothing to upload to).
+    let healthKitBackgroundDelivery: (any HealthKitBackgroundDelivering)?
 
     @MainActor
     init(studyConfigurationProvider: any StudyConfigurationProviding,
@@ -46,7 +49,8 @@ struct AppContainer {
          studyBackendClientFactory: (any StudyBackendClientFactory)? = nil,
          installationID: any InstallationIdentifying = KeychainInstallationIDStore(),
          syncCoordinator: (any SyncCoordinating)? = nil,
-         router: (any StudyBackendRouting)? = nil) {
+         router: (any StudyBackendRouting)? = nil,
+         healthKitBackgroundDelivery: (any HealthKitBackgroundDelivering)? = nil) {
         self.studyConfigurationProvider = studyConfigurationProvider
         self.participantStateStore = participantStateStore
         self.healthKitService = healthKitService
@@ -72,6 +76,7 @@ struct AppContainer {
         self.installationID = installationID
         self.syncCoordinator = syncCoordinator
         self.router = router
+        self.healthKitBackgroundDelivery = healthKitBackgroundDelivery
     }
 
     @MainActor static let live: AppContainer = {
@@ -112,6 +117,7 @@ struct AppContainer {
                                                                  healthKitCursorStore: healthCursors,
                                                                  mediaStorage: media.storage, notifications: notifications),
                             backendEnvironment: environment, studyBackendClientFactory: studyClients,
-                            installationID: installation, syncCoordinator: sync, router: router)
+                            installationID: installation, syncCoordinator: sync, router: router,
+                            healthKitBackgroundDelivery: HealthKitBackgroundDelivery { _ = await sync.synchronizePendingLocalChanges() })
     }()
 }

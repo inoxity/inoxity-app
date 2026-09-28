@@ -13,11 +13,19 @@ protocol HealthKitUploadQueuePersisting: Sendable {
     func update(_ sample: HealthKitSampleUpload) async throws
     func reset(studyID: String) async throws
     func diagnostics(studyID: String) async -> HealthKitUploadQueueDiagnostics
+    func pruneAcknowledged(studyID: String, keeping: Set<String>) async throws
 }
 
 actor UserDefaultsHealthKitUploadQueue: HealthKitUploadQueuePersisting {
     static let persistenceVersion = 1
-    private struct Envelope: Codable { let version: Int; var studies: [String: [HealthKitSampleUpload]] }
+    // prunedAcknowledgedCounts/prunedLastAcknowledgedAt carry diagnostics for records that
+    // `pruneAcknowledged` has already dropped. Optional so envelopes saved before they existed
+    // still decode under the same persistenceVersion.
+    private struct Envelope: Codable {
+        let version: Int; var studies: [String: [HealthKitSampleUpload]]
+        var prunedAcknowledgedCounts: [String: Int]? = nil
+        var prunedLastAcknowledgedAt: [String: Date]? = nil
+    }
     private let defaults: UserDefaults; private let key: String; private var envelope: Envelope
     init(defaults: UserDefaults = .standard, key: String = "inoxity.healthkit-upload-queue.v1") {
         self.defaults = defaults; self.key = key
@@ -31,10 +39,12 @@ actor UserDefaultsHealthKitUploadQueue: HealthKitUploadQueuePersisting {
         if let data = try? JSONEncoder().encode(envelope) { defaults.set(data, forKey: key) }
     }
     func enqueue(_ samples: [HealthKitSampleUpload]) throws {
-        for sample in samples {
-            var values = envelope.studies[sample.stableStudyID] ?? []
-            if !values.contains(where: { $0.clientSampleID == sample.clientSampleID }) { values.append(sample) }
-            envelope.studies[sample.stableStudyID] = values.sorted(by: Self.order)
+        guard !samples.isEmpty else { return }
+        for (studyID, incoming) in Dictionary(grouping: samples, by: \.stableStudyID) {
+            var values = envelope.studies[studyID] ?? []
+            var known = Set(values.map(\.clientSampleID))
+            for sample in incoming where known.insert(sample.clientSampleID).inserted { values.append(sample) }
+            envelope.studies[studyID] = values.sorted(by: Self.order)
         }
         try save()
     }
@@ -44,15 +54,37 @@ actor UserDefaultsHealthKitUploadQueue: HealthKitUploadQueuePersisting {
         guard var records = envelope.studies[sample.stableStudyID], let index = records.firstIndex(where: { $0.id == sample.id }) else { return }
         records[index] = sample; envelope.studies[sample.stableStudyID] = records.sorted(by: Self.order); try save()
     }
-    func reset(studyID: String) throws { envelope.studies.removeValue(forKey: studyID); try save() }
+    func reset(studyID: String) throws {
+        envelope.studies.removeValue(forKey: studyID)
+        envelope.prunedAcknowledgedCounts?.removeValue(forKey: studyID)
+        envelope.prunedLastAcknowledgedAt?.removeValue(forKey: studyID)
+        try save()
+    }
+    /// Drops acknowledged records — the Study Backend already has them — except `keeping` (IDs a
+    /// sync cursor still has to see acknowledged before it can advance). Without this the queue
+    /// holds every sample ever uploaded, and each save re-encodes all of it.
+    func pruneAcknowledged(studyID: String, keeping: Set<String>) throws {
+        guard let values = envelope.studies[studyID] else { return }
+        let pruned = values.filter { $0.syncStatus == .acknowledged && !keeping.contains($0.clientSampleID) }
+        guard !pruned.isEmpty else { return }
+        envelope.studies[studyID] = values.filter { !($0.syncStatus == .acknowledged && !keeping.contains($0.clientSampleID)) }
+        envelope.prunedAcknowledgedCounts = (envelope.prunedAcknowledgedCounts ?? [:]).merging([studyID: pruned.count], uniquingKeysWith: +)
+        if let latest = pruned.compactMap(\.acknowledgedAt).max() {
+            envelope.prunedLastAcknowledgedAt = (envelope.prunedLastAcknowledgedAt ?? [:]).merging([studyID: latest], uniquingKeysWith: max)
+        }
+        try save()
+    }
     func diagnostics(studyID: String) -> HealthKitUploadQueueDiagnostics {
         let values = envelope.studies[studyID] ?? []
+        let prunedCount: Int = envelope.prunedAcknowledgedCounts?[studyID] ?? 0
+        var acknowledgedDates: [Date] = values.compactMap(\.acknowledgedAt)
+        if let prunedLatest = envelope.prunedLastAcknowledgedAt?[studyID] { acknowledgedDates.append(prunedLatest) }
         return .init(pending: values.filter { $0.syncStatus == .pending || $0.syncStatus == .syncing }.count,
-            acknowledged: values.filter { $0.syncStatus == .acknowledged }.count,
+            acknowledged: values.filter { $0.syncStatus == .acknowledged }.count + prunedCount,
             retryNeeded: values.filter { $0.syncStatus == .retryableFailure }.count,
             routingRequired: values.filter { $0.syncStatus == .routingRequired }.count,
             attentionRequired: values.filter { $0.syncStatus == .attentionRequired }.count,
-            lastSuccessfulUpload: values.compactMap(\.acknowledgedAt).max())
+            lastSuccessfulUpload: acknowledgedDates.max())
     }
     private static func order(_ lhs: HealthKitSampleUpload, _ rhs: HealthKitSampleUpload) -> Bool {
         if lhs.sampleStart != rhs.sampleStart { return lhs.sampleStart < rhs.sampleStart }

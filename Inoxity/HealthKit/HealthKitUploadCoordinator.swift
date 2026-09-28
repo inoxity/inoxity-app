@@ -57,42 +57,82 @@ actor HealthKitUploadCoordinator: HealthKitUploadCoordinating {
                                  nonRetryableFailures: counters.nonRetryableFailures + (Self.retryable(error) ? 0 : 1))
             }
         }
+        let stillNeeded = Set(await cursors.cursors(studyID: state.studyID).flatMap(\.candidateRequiredSampleIDs))
+        try? await queue.pruneAcknowledged(studyID: state.studyID, keeping: stillNeeded)
         return counters
     }
 
     private func uploadQueued(studyID: String, repository: any HealthKitSampleUploadRepository) async -> HealthKitUploadRunResult {
-        var records = await queue.records(studyID: studyID).filter { $0.syncStatus == .pending || $0.syncStatus == .retryableFailure }
-        records.sort { ($0.sampleStart, $0.clientSampleID) < ($1.sampleStart, $1.clientSampleID) }
-        var attempted = 0, succeeded = 0, retryableFailures = 0, nonRetryableFailures = 0
-        for offset in stride(from: 0, to: records.count, by: policy.maximumUploadBatchSize) {
-            let batch = Array(records[offset..<min(offset + policy.maximumUploadBatchSize, records.count)])
-            attempted += 1
-            do {
-                let response = try await repository.submitHealthKitSamples(batch)
-                let acknowledged = Dictionary(uniqueKeysWithValues: response.acknowledgments.map { ($0.clientSampleID, $0) })
-                for var record in batch {
-                    record.lastAttemptAt = now()
-                    if let ack = acknowledged[record.clientSampleID] {
-                        record.syncStatus = .acknowledged; record.acknowledgedAt = ack.receivedAt
-                        record.remoteAcknowledgmentID = ack.acknowledgmentID; record.failureCategory = nil; succeeded += 1
-                    } else { record.syncStatus = .retryableFailure; record.retryCount += 1; record.failureCategory = .unavailable; retryableFailures += 1 }
-                    try await queue.update(record)
-                }
-            } catch {
-                let retry = Self.retryable(error)
-                for var record in batch {
-                    record.lastAttemptAt = now(); record.retryCount += 1
-                    record.syncStatus = retry ? .retryableFailure : .attentionRequired
-                    record.failureCategory = retry ? .unavailable : .validation; try? await queue.update(record)
-                }
-                if retry { retryableFailures += 1 } else { nonRetryableFailures += 1 }
+        let eligible = await queue.records(studyID: studyID).filter {
+            $0.syncStatus == .pending || $0.syncStatus == .retryableFailure
+                || ($0.syncStatus == .attentionRequired && $0.setAsideAfterRejection != true)
+        }
+        var counters = HealthKitUploadRunResult(attempted: 0, succeeded: 0, retryableFailures: 0, nonRetryableFailures: 0)
+        // Batched per metric, so one metric's failing batch can't hold up another metric's cursor.
+        for identifier in Set(eligible.map(\.healthKitIdentifier)).sorted() {
+            let records = eligible.filter { $0.healthKitIdentifier == identifier }
+                .sorted { ($0.sampleStart, $0.clientSampleID) < ($1.sampleStart, $1.clientSampleID) }
+            for offset in stride(from: 0, to: records.count, by: policy.maximumUploadBatchSize) {
+                let batch = Array(records[offset..<min(offset + policy.maximumUploadBatchSize, records.count)])
+                let outcome = await submit(batch, repository: repository)
+                counters = Self.add(counters, outcome.counters)
+                if outcome.stop == .allMetrics { return counters }
+                if outcome.stop == .thisMetric { break }
             }
         }
-        return .init(attempted: attempted, succeeded: succeeded, retryableFailures: retryableFailures, nonRetryableFailures: nonRetryableFailures)
+        return counters
     }
+    private enum UploadStop { case none, thisMetric, allMetrics }
+    /// Submits one batch. A sample-level rejection bisects the batch until the offending sample(s)
+    /// are isolated and set aside, so the rest still upload. A retryable failure stops this metric
+    /// for this pass; a systemic failure (enrollment/backend identity) stops the whole pass and
+    /// leaves every record as it was for a later retry.
+    private func submit(_ batch: [HealthKitSampleUpload], repository: any HealthKitSampleUploadRepository) async -> (counters: HealthKitUploadRunResult, stop: UploadStop) {
+        do {
+            let response = try await repository.submitHealthKitSamples(batch)
+            let acknowledged = Dictionary(response.acknowledgments.map { ($0.clientSampleID, $0) }, uniquingKeysWith: { first, _ in first })
+            var succeeded = 0, retryableFailures = 0
+            for var record in batch {
+                record.lastAttemptAt = now()
+                if let ack = acknowledged[record.clientSampleID] {
+                    record.syncStatus = .acknowledged; record.acknowledgedAt = ack.receivedAt
+                    record.remoteAcknowledgmentID = ack.acknowledgmentID; record.failureCategory = nil; succeeded += 1
+                } else { record.syncStatus = .retryableFailure; record.retryCount += 1; record.failureCategory = .unavailable; retryableFailures += 1 }
+                try? await queue.update(record)
+            }
+            return (.init(attempted: 1, succeeded: succeeded, retryableFailures: retryableFailures, nonRetryableFailures: 0), .none)
+        } catch let error where Self.sampleRejection(error) {
+            guard batch.count > 1 else {
+                var record = batch[0]
+                record.lastAttemptAt = now(); record.retryCount += 1; record.syncStatus = .attentionRequired
+                record.failureCategory = .validation; record.setAsideAfterRejection = true; try? await queue.update(record)
+                return (.init(attempted: 1, succeeded: 0, retryableFailures: 0, nonRetryableFailures: 1), .none)
+            }
+            let middle = batch.count / 2
+            let first = await submit(Array(batch[..<middle]), repository: repository)
+            var counters = Self.add(.init(attempted: 1, succeeded: 0, retryableFailures: 0, nonRetryableFailures: 0), first.counters)
+            guard first.stop == .none else { return (counters, first.stop) }
+            let second = await submit(Array(batch[middle...]), repository: repository)
+            counters = Self.add(counters, second.counters)
+            return (counters, second.stop)
+        } catch let error where Self.retryable(error) {
+            for var record in batch {
+                record.lastAttemptAt = now(); record.retryCount += 1
+                if record.syncStatus != .attentionRequired { record.syncStatus = .retryableFailure }
+                record.failureCategory = .unavailable; try? await queue.update(record)
+            }
+            return (.init(attempted: 1, succeeded: 0, retryableFailures: 1, nonRetryableFailures: 0), .thisMetric)
+        } catch {
+            return (.init(attempted: 1, succeeded: 0, retryableFailures: 0, nonRetryableFailures: 1), .allMetrics)
+        }
+    }
+    /// A sample the Study Backend rejected on its own is "resolved" for cursor purposes — it can
+    /// never be acknowledged, and waiting on it would freeze this metric permanently.
     private func candidateAcknowledged(_ cursor: HealthKitSyncCursor) async -> Bool {
-        let acknowledged = Set(await queue.records(studyID: cursor.key.stableStudyID).filter { $0.syncStatus == .acknowledged }.map(\.clientSampleID))
-        return Set(cursor.candidateRequiredSampleIDs).isSubset(of: acknowledged)
+        let resolved = Set(await queue.records(studyID: cursor.key.stableStudyID).filter {
+            $0.syncStatus == .acknowledged || $0.setAsideAfterRejection == true
+        }.map(\.clientSampleID))
+        return Set(cursor.candidateRequiredSampleIDs).isSubset(of: resolved)
     }
     private func promote(_ cursor: inout HealthKitSyncCursor) async throws {
         cursor.committedAnchor = cursor.candidateAnchor; cursor.candidateAnchor = nil
@@ -149,6 +189,10 @@ actor HealthKitUploadCoordinator: HealthKitUploadCoordinating {
     // follow-up fix rather than folded silently into this change.
     private static func parse(_ value: String?) -> Date? {
         guard let value else { return nil }; return ISO8601DateFormatter().date(from: value)
+    }
+    private static func sampleRejection(_ error: Error) -> Bool {
+        guard let value = error as? HealthKitUploadError else { return false }
+        return value == .invalidSample || value == .conflictingDuplicate
     }
     private static func retryable(_ error: Error) -> Bool {
         if let value = error as? HealthKitUploadError { return value == .unavailable }

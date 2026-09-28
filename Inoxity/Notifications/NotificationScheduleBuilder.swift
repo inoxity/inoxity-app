@@ -175,7 +175,12 @@ struct NotificationScheduleBuilder: Sendable {
                    String(survey.promptExpirationMinutes ?? -1)]
             return (scheduleFields + notificationFields).joined(separator: "|")
         }.joined(separator: "||")
-        let source = [String(configuration.schemaVersion), configuration.identity.id,
+        // Bumping triggerStyle changes every fingerprint, which makes reconcileNotifications
+        // reschedule all pending reminders once. "floating-v1" moved triggers off a pinned zone
+        // (see NotificationService.triggerComponents), and reminders already pending on a phone
+        // must be replaced, not left pinned to the zone they were scheduled in.
+        let triggerStyle = "floating-v1"
+        let source = [triggerStyle, String(configuration.schemaVersion), configuration.identity.id,
                       String(configuration.notifications.enabled), configuration.schedule.startDate ?? "",
                       configuration.schedule.endDate ?? "", participant.studyID,
                       String(participant.enrollmentDate.timeIntervalSince1970), participant.participationStatus.rawValue,

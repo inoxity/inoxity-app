@@ -562,6 +562,10 @@ final class AppState: ObservableObject {
     }
 
     func applicationDidBecomeActive() async {
+        // Foundation caches TimeZone.current until this is called. The NSSystemTimeZoneDidChange
+        // handler in InoxityApp resets it too, but that event can be missed while the app is
+        // suspended, and a stale zone here would reconcile reminders against the old zone.
+        NSTimeZone.resetSystemTimeZone()
         await refreshNotificationStatus(reconcileIfNeeded: true)
         refreshSurveyRuntime()
         processPendingSurveyCallbackIfPossible()

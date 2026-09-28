@@ -12,6 +12,17 @@ import XCTest
         await service.removePendingRequests(forStudyID: "a")
         let after = await service.pendingRequests(); XCTAssertEqual(after, [b])
     }
+    func testTriggerIsFloatingLocalClockTimeSoRemindersFollowTravel() {
+        // 16:00 UTC is 09:00 in Los Angeles (PDT) on this date.
+        let fireDate = Date(timeIntervalSince1970: 1_790_870_400)
+        let value = ScheduledNotification(identifier: "inoxity.a.r.1", fireDate: fireDate, title: "Inoxity", body: "Activity available.",
+            payload: .init(studyID: "a", reminderID: "r", notificationKind: .message, surveyID: nil, occurrenceID: "1", destination: .home),
+            timeZoneIdentifier: "America/Los_Angeles")
+        let components = NotificationService.triggerComponents(for: value)
+        XCTAssertNil(components.timeZone, "a pinned zone would freeze the reminder to the enrollment zone")
+        XCTAssertEqual([components.year, components.month, components.day, components.hour, components.minute],
+                       [2026, 10, 1, 9, 0])
+    }
     private func request(_ id: String, study: String) -> ScheduledNotification {
         .init(identifier: id, fireDate: Date(timeIntervalSince1970: 100), title: "Inoxity", body: "Activity available.", payload: .init(studyID: study, reminderID: "r", notificationKind: .message, surveyID: nil, occurrenceID: "1", destination: .home))
     }

@@ -30,8 +30,14 @@ struct NotificationScheduleBuilder: Sendable {
         let studyStart = ParticipantStartDateResolver.resolve(schedule: configuration.schedule, participant: participant, calendar: calendar)
             ?? date(configuration.schedule.startDate, calendar: calendar) ?? participant.enrollmentDate
         let studyEnd = endOfDay(configuration.schedule.endDate, calendar: calendar) ?? horizonEnd
+        // A per-participant duration ends this participant's study on their own last day, which a
+        // study-wide `endDate` can't express under rolling enrollment. Without it here, reminders
+        // kept coming after the participant had finished.
+        let durationEnd = StudyProgress.participantCollectionEnd(
+            startDate: ParticipantStartDateResolver.resolve(schedule: configuration.schedule, participant: participant, calendar: calendar),
+            participantDurationDays: configuration.schedule.participantDurationDays, calendar: calendar)
         let lower = [now, participant.enrollmentDate, participantCollectionStart, studyStart].compactMap { $0 }.max() ?? now
-        let upper = [horizonEnd, participantCollectionEnd, studyEnd].compactMap { $0 }.min() ?? horizonEnd
+        let upper = [horizonEnd, participantCollectionEnd, studyEnd, durationEnd].compactMap { $0 }.min() ?? horizonEnd
         guard lower <= upper else { return emptyPlan(fingerprint: fingerprint) }
 
         let enabledSurveyIDs = Set(configuration.surveys.filter(\.enabled).map(\.id))
@@ -180,9 +186,15 @@ struct NotificationScheduleBuilder: Sendable {
         // (see NotificationService.triggerComponents), and reminders already pending on a phone
         // must be replaced, not left pinned to the zone they were scheduled in.
         let triggerStyle = "floating-v1"
+        // participantDurationDays/startDateMode/participantSelectedStartDate set where the
+        // participant's study ends (see StudyProgress.participantCollectionEnd), so changing any of
+        // them must reschedule.
+        let durationFields: [String] = [String(configuration.schedule.participantDurationDays ?? -1),
+                      configuration.schedule.resolvedStartDateMode.rawValue,
+                      String(participant.participantSelectedStartDate?.timeIntervalSince1970 ?? -1)]
         let source = [triggerStyle, String(configuration.schemaVersion), configuration.identity.id,
                       String(configuration.notifications.enabled), configuration.schedule.startDate ?? "",
-                      configuration.schedule.endDate ?? "", participant.studyID,
+                      configuration.schedule.endDate ?? "", durationFields.joined(separator: "|"), participant.studyID,
                       String(participant.enrollmentDate.timeIntervalSince1970), participant.participationStatus.rawValue,
                       timeZone.identifier, String(policy.rollingHorizonDays),
                       String(policy.maximumPendingRequestsPerStudy), reminderText, surveyScheduleText,

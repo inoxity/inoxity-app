@@ -19,8 +19,13 @@ struct SurveyOccurrenceBuilder: Sendable {
         let futureEnd = calendar.date(byAdding: .day, value: policy.futureDays, to: now) ?? now
         let studyStart = date(configuration.schedule.startDate, calendar: calendar) ?? participant.enrollmentDate
         let studyEnd = endOfDay(configuration.schedule.endDate, calendar: calendar) ?? futureEnd
+        // Same per-participant end as NotificationScheduleBuilder, so no survey occurs after the
+        // participant's study is over.
+        let durationEnd = StudyProgress.participantCollectionEnd(
+            startDate: ParticipantStartDateResolver.resolve(schedule: configuration.schedule, participant: participant, calendar: calendar),
+            participantDurationDays: configuration.schedule.participantDurationDays, calendar: calendar)
         let lower = [historyStart, participant.enrollmentDate, participantCollectionStart, studyStart].compactMap { $0 }.max() ?? historyStart
-        let upper = [futureEnd, participantCollectionEnd, studyEnd].compactMap { $0 }.min() ?? futureEnd
+        let upper = [futureEnd, participantCollectionEnd, studyEnd, durationEnd].compactMap { $0 }.min() ?? futureEnd
         guard lower <= upper else { return [] }
 
         var result = [SurveyOccurrence](), seen = Set<String>()

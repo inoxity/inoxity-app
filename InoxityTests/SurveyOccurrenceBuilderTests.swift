@@ -90,6 +90,17 @@ final class SurveyOccurrenceBuilderTests: XCTestCase {
         XCTAssertEqual(value?.status, .missed)
     }
 
+    func testNoOccurrencesAfterTheParticipantsLastDay() throws {
+        let zone = TimeZone(identifier: "America/Los_Angeles")!
+        let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "SleepStudy", withExtension: "json"))
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+        var schedule = try XCTUnwrap(root["schedule"] as? [String: Any]); schedule["participantDurationDays"] = 3; root["schedule"] = schedule
+        let config = try JSONDecoder().decode(StudyConfiguration.self, from: JSONSerialization.data(withJSONObject: root))
+        let participant = ParticipantState(studyID: config.identity.id, enrollmentDate: date(2026,7,24,8,0,zone))
+        let occurrences = try SurveyOccurrenceBuilder().build(configuration: config, participant: participant, now: date(2026,7,30,8,0,zone), timeZone: zone)
+        XCTAssertFalse(occurrences.isEmpty)
+        XCTAssertTrue(occurrences.allSatisfy { $0.scheduledFor < self.date(2026,7,27,0,0,zone) })
+    }
     private func surveyWithPromptExpiration(_ minutes: Int) throws -> StudyConfiguration {
         let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "SleepStudy", withExtension: "json"))
         var root = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])

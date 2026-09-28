@@ -10,13 +10,13 @@ struct DaySelectorHeader: View {
 
     var body: some View {
         HStack {
-            Button { step(-1) } label: { Image(systemName: "chevron.left") }
+            Button { step(-1) } label: { Image(systemName: "chevron.left").frame(width: 44, height: 44).contentShape(Rectangle()) }
                 .disabled(!canStep(-1))
                 .accessibilityLabel("Previous day")
             Spacer()
             Text(label).font(.headline).foregroundStyle(InoxityTheme.primaryText)
             Spacer()
-            Button { step(1) } label: { Image(systemName: "chevron.right") }
+            Button { step(1) } label: { Image(systemName: "chevron.right").frame(width: 44, height: 44).contentShape(Rectangle()) }
                 .disabled(!canStep(1))
                 .accessibilityLabel("Next day")
         }

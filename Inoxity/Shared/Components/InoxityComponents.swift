@@ -3,16 +3,25 @@ import SwiftUI
 struct PrimaryButton: View {
     let title: String; var isEnabled = true; let action: () -> Void
     var body: some View {
-        Button(action: action) { Text(title).font(.headline).frame(maxWidth: .infinity, minHeight: 52) }
-            .buttonStyle(.plain).foregroundStyle(InoxityTheme.background)
-            .background(isEnabled ? InoxityTheme.aqua : InoxityTheme.border).clipShape(RoundedRectangle(cornerRadius: 14)).disabled(!isEnabled)
+        // Size, background and contentShape live inside the label: a Button is only as tappable as
+        // its label, so styling applied outside it leaves everything but the text dead to taps.
+        Button(action: action) {
+            Text(title).font(.headline).foregroundStyle(InoxityTheme.background).frame(maxWidth: .infinity, minHeight: 52)
+                .background(isEnabled ? InoxityTheme.aqua : InoxityTheme.border).clipShape(RoundedRectangle(cornerRadius: 14))
+                .contentShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain).disabled(!isEnabled)
     }
 }
 struct SecondaryButton: View {
     let title: String; let action: () -> Void
     var body: some View {
-        Button(title, action: action).font(.headline).foregroundStyle(InoxityTheme.pink).frame(maxWidth: .infinity, minHeight: 50)
-            .overlay(RoundedRectangle(cornerRadius: 14).stroke(InoxityTheme.pink))
+        // See PrimaryButton — the frame and contentShape must be inside the label to be tappable.
+        Button(action: action) {
+            Text(title).font(.headline).foregroundStyle(InoxityTheme.pink).frame(maxWidth: .infinity, minHeight: 50)
+                .overlay(RoundedRectangle(cornerRadius: 14).stroke(InoxityTheme.pink))
+                .contentShape(RoundedRectangle(cornerRadius: 14))
+        }
     }
 }
 struct StyledTextField: View {

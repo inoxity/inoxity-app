@@ -34,6 +34,18 @@ struct RootView: View {
             try? await Task.sleep(nanoseconds: 1_200_000_000)
             minimumSplashDurationElapsed = true
         }
+        .alert("Take your survey now?", isPresented: Binding(
+            get: { state.pendingSurveyStartID != nil },
+            set: { if !$0 { state.cancelSurveyStart() } }
+        )) {
+            // Reads the ID before the alert's own dismissal clears it.
+            if let id = state.pendingSurveyStartID {
+                Button("Yes, take it now") { Task { await state.confirmSurveyStart(id) } }
+            }
+            Button("Take later", role: .cancel) { state.cancelSurveyStart() }
+        } message: {
+            Text("Are you sure you want to take your survey right now? You won’t have this chance again.")
+        }
         .sheet(item: $state.activeSurveyPresentation) { request in
             InAppSurveyView(request: request) { Task { await state.confirmInAppSurveyPresented(request.occurrenceID) } }
         }

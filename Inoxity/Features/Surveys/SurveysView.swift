@@ -17,7 +17,7 @@ struct SurveysView: View {
                     } else {
                         section("Available now", statuses: [.available, .opened], empty: "No surveys are available right now.")
                         section("Upcoming", statuses: [.upcoming], empty: nil)
-                        section("Completed recently", statuses: [.completed], empty: nil)
+                        section("Completed recently", statuses: [.completed, .done], empty: nil)
                         section("Missed recently", statuses: [.missed], empty: nil)
                     }
                 }
@@ -41,7 +41,7 @@ struct SurveysView: View {
                 if values.isEmpty, let empty { Text(empty).font(.subheadline).foregroundStyle(InoxityTheme.secondaryText) }
                 ForEach(values) { occurrence in
                     SurveyOccurrenceCard(occurrence: occurrence, focused: state.focusedSurveyOccurrenceID == occurrence.id) {
-                        Task { await state.openSurveyOccurrence(occurrence.id) }
+                        state.requestSurveyStart(occurrence.id)
                     }.id(occurrence.id)
                 }
             }

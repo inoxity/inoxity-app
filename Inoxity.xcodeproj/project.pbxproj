@@ -74,10 +74,10 @@
 		B00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift */; };
 		B00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift */; };
 		B00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift */; };
+		BD3D0000000000000000FF03 /* InoxityTests/EnrollmentDiagnosticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D0000000000000000FF03 /* InoxityTests/EnrollmentDiagnosticsTests.swift */; };
 		B00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift */; };
 		B00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift */; };
 		B00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift */; };
-		BFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift */; };
 		B00000000000000000000066 /* InoxityTests/SurveyNotificationRoutingIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000066 /* InoxityTests/SurveyNotificationRoutingIntegrationTests.swift */; };
 		B00000000000000000000067 /* InoxityTests/AppStateSurveyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000067 /* InoxityTests/AppStateSurveyTests.swift */; };
 		B00000000000000000000068 /* InoxityTests/SurveyCompletionValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000068 /* InoxityTests/SurveyCompletionValidatorTests.swift */; };
@@ -138,6 +138,7 @@
 		B000000000000000000000CB /* Inoxity/Features/Completion/StudyCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000CB /* Inoxity/Features/Completion/StudyCompletionView.swift */; };
 		B000000000000000000000CC /* Inoxity/HealthKit/HealthKitCharacteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000000000000000000000CC /* Inoxity/HealthKit/HealthKitCharacteristics.swift */; };
 		B3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift */; };
+		BD3D0000000000000000FF02 /* Inoxity/Backend/EnrollmentDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D0000000000000000FF02 /* Inoxity/Backend/EnrollmentDiagnostics.swift */; };
 		B3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift */; };
 		B3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift */; };
 		B3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift */; };
@@ -160,8 +161,10 @@
 		BD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */; };
 		BD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */; };
 		BD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */; };
+		BD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift */; };
 		BD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */; };
 		BD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift */; };
+		BFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -245,10 +248,10 @@
 		F00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyConfigurationTests.swift; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyOccurrenceBuilderTests.swift; sourceTree = SOURCE_ROOT; };
+		FD3D0000000000000000FF03 /* InoxityTests/EnrollmentDiagnosticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/EnrollmentDiagnosticsTests.swift; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyURLBuilderTests.swift; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyCallbackParserTests.swift; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyPersistenceMigrationTests.swift; sourceTree = SOURCE_ROOT; };
-		FFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/StudyConfigurationFuzzTests.swift; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000066 /* InoxityTests/SurveyNotificationRoutingIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyNotificationRoutingIntegrationTests.swift; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000067 /* InoxityTests/AppStateSurveyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/AppStateSurveyTests.swift; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000068 /* InoxityTests/SurveyCompletionValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/SurveyCompletionValidatorTests.swift; sourceTree = SOURCE_ROOT; };
@@ -309,6 +312,7 @@
 		F000000000000000000000CB /* Inoxity/Features/Completion/StudyCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Completion/StudyCompletionView.swift; sourceTree = SOURCE_ROOT; };
 		F000000000000000000000CC /* Inoxity/HealthKit/HealthKitCharacteristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitCharacteristics.swift; sourceTree = SOURCE_ROOT; };
 		F3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/BackendDomain.swift; sourceTree = SOURCE_ROOT; };
+		FD3D0000000000000000FF02 /* Inoxity/Backend/EnrollmentDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/EnrollmentDiagnostics.swift; sourceTree = SOURCE_ROOT; };
 		F3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Backend/Environment/BackendEnvironment.swift; sourceTree = SOURCE_ROOT; };
 		F3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Shared/Logging/SanitizedLogger.swift; sourceTree = SOURCE_ROOT; };
 		F3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Configuration/Cache/StudyConfigurationCache.swift; sourceTree = SOURCE_ROOT; };
@@ -332,8 +336,10 @@
 		FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitSampleQuerying.swift; sourceTree = SOURCE_ROOT; };
 		FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitUploadPersistence.swift; sourceTree = SOURCE_ROOT; };
 		FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitUploadCoordinator.swift; sourceTree = SOURCE_ROOT; };
+		FD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/HealthKit/HealthKitBackgroundDelivery.swift; sourceTree = SOURCE_ROOT; };
 		FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift; sourceTree = SOURCE_ROOT; };
 		FD3D00000000000000000006 /* InoxityTests/HealthKitUploadPipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/HealthKitUploadPipelineTests.swift; sourceTree = SOURCE_ROOT; };
+		FFUZ00000000000000000A1 /* InoxityTests/StudyConfigurationFuzzTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InoxityTests/StudyConfigurationFuzzTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -364,8 +370,10 @@
 				FD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift */,
 				FD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift */,
 				FD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift */,
+				FD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift */,
 				FD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift */,
 				F3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift */,
+				FD3D0000000000000000FF02 /* Inoxity/Backend/EnrollmentDiagnostics.swift */,
 				F3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift */,
 				F3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift */,
 				F3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift */,
@@ -528,6 +536,7 @@
 				F00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift */,
 				F00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift */,
 				F00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift */,
+				FD3D0000000000000000FF03 /* InoxityTests/EnrollmentDiagnosticsTests.swift */,
 				F00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift */,
 				F00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift */,
 				F00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift */,
@@ -669,8 +678,10 @@
 				BD3D00000000000000000002 /* Inoxity/HealthKit/HealthKitSampleQuerying.swift in Sources */,
 				BD3D00000000000000000003 /* Inoxity/HealthKit/HealthKitUploadPersistence.swift in Sources */,
 				BD3D00000000000000000004 /* Inoxity/HealthKit/HealthKitUploadCoordinator.swift in Sources */,
+				BD3D0000000000000000FF01 /* Inoxity/HealthKit/HealthKitBackgroundDelivery.swift in Sources */,
 				BD3D00000000000000000005 /* Inoxity/Features/Settings/HealthKitUploadDiagnosticsView.swift in Sources */,
 				B3B000000000000000000001 /* Inoxity/Backend/BackendDomain.swift in Sources */,
+				BD3D0000000000000000FF02 /* Inoxity/Backend/EnrollmentDiagnostics.swift in Sources */,
 				B3B000000000000000000002 /* Inoxity/Backend/Environment/BackendEnvironment.swift in Sources */,
 				B3B000000000000000000003 /* Inoxity/Shared/Logging/SanitizedLogger.swift in Sources */,
 				B3B000000000000000000004 /* Inoxity/Configuration/Cache/StudyConfigurationCache.swift in Sources */,
@@ -799,6 +810,7 @@
 				B00000000000000000000060 /* InoxityTests/SurveyConfigurationTests.swift in Sources */,
 				B00000000000000000000061 /* InoxityTests/SurveyOccurrenceIdentifierFactoryTests.swift in Sources */,
 				B00000000000000000000062 /* InoxityTests/SurveyOccurrenceBuilderTests.swift in Sources */,
+				BD3D0000000000000000FF03 /* InoxityTests/EnrollmentDiagnosticsTests.swift in Sources */,
 				B00000000000000000000063 /* InoxityTests/SurveyURLBuilderTests.swift in Sources */,
 				B00000000000000000000064 /* InoxityTests/SurveyCallbackParserTests.swift in Sources */,
 				B00000000000000000000065 /* InoxityTests/SurveyPersistenceMigrationTests.swift in Sources */,

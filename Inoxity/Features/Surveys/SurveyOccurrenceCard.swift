@@ -21,7 +21,11 @@ struct SurveyOccurrenceCard: View {
                 Text("Available \(occurrence.opensAt.formatted(date: .omitted, time: .shortened))–\(occurrence.closesAt.formatted(date: .omitted, time: .shortened))")
                     .font(.caption).foregroundStyle(InoxityTheme.secondaryText)
                 if let completed = occurrence.completedAt { Text("Completed \(completed.formatted(date: .abbreviated, time: .shortened))").font(.caption).foregroundStyle(InoxityTheme.aqua) }
-                if occurrence.status == .available || occurrence.status == .opened { PrimaryButton(title: occurrence.status == .opened ? "Return to Survey" : "Open Survey", action: openAction) }
+                if occurrence.status.canStart { PrimaryButton(title: "Take Survey", action: openAction) }
+                if occurrence.status == .opened {
+                    Text("You’ve started this survey. Each survey can only be taken once.")
+                        .font(.caption).foregroundStyle(InoxityTheme.secondaryText)
+                }
                 if let privacy = occurrence.privacyText { Text(privacy).font(.caption).foregroundStyle(InoxityTheme.secondaryText) }
             }
         }
@@ -31,7 +35,9 @@ struct SurveyOccurrenceCard: View {
     private func statusText(now: Date) -> String {
         switch occurrence.status {
         case .upcoming: return "Opens in \(Self.countdown(from: now, to: occurrence.opensAt))"
-        case .available, .opened: return "\(Self.countdown(from: now, to: occurrence.closesAt)) left"
+        case .available: return "\(Self.countdown(from: now, to: occurrence.closesAt)) left"
+        case .opened: return "Started"
+        case .done: return "Done"
         case .missed: return "Expired"
         default: return occurrence.status.rawValue.capitalized
         }
@@ -45,5 +51,5 @@ struct SurveyOccurrenceCard: View {
         return "\(minutes)m"
     }
 
-    private var statusColor: Color { occurrence.status == .completed ? InoxityTheme.aqua : occurrence.status == .missed ? InoxityTheme.pink : InoxityTheme.primaryText }
+    private var statusColor: Color { (occurrence.status == .completed || occurrence.status == .done) ? InoxityTheme.aqua : occurrence.status == .missed ? InoxityTheme.pink : InoxityTheme.primaryText }
 }

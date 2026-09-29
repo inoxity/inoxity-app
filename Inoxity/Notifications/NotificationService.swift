@@ -72,15 +72,24 @@ final class NotificationService: NSObject, NotificationServicing, UNUserNotifica
             content.categoryIdentifier = value.payload.notificationKind == .survey
                 ? Self.surveyCategoryIdentifier : Self.categoryIdentifier
             content.userInfo = value.payload.dictionary
-            var calendar = Calendar(identifier: .gregorian)
-            calendar.timeZone = value.timeZoneIdentifier.flatMap(TimeZone.init(identifier:)) ?? .current
-            var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: value.fireDate)
-            components.timeZone = calendar.timeZone
             let request = UNNotificationRequest(identifier: value.identifier, content: content,
-                                                trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false))
+                                                trigger: UNCalendarNotificationTrigger(dateMatching: Self.triggerComponents(for: value), repeats: false))
             do { try await center.add(request) }
             catch { throw NotificationServiceError.nativeFailure(error.localizedDescription) }
         }
+    }
+
+    /// The reminder's local clock time with NO time zone attached ("floating"). iOS fires these at
+    /// that clock time in whatever zone the phone is in when they come due, so reminders follow a
+    /// participant who travels even if they never open the app. Attaching `components.timeZone`
+    /// (as this used to) pinned every pending reminder to the zone it was scheduled in, until the
+    /// app next ran and rescheduled. The components are read in the zone the plan was built for,
+    /// so they're exactly that plan's local times. Reminder and survey-occurrence IDs are keyed on
+    /// the same local times, so they still match after travel.
+    static func triggerComponents(for value: ScheduledNotification) -> DateComponents {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = value.timeZoneIdentifier.flatMap(TimeZone.init(identifier:)) ?? .current
+        return calendar.dateComponents([.year, .month, .day, .hour, .minute], from: value.fireDate)
     }
 
     func removePendingRequests(with identifiers: [String]) { center.removePendingNotificationRequests(withIdentifiers: identifiers) }

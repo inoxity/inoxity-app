@@ -18,12 +18,15 @@ struct WithdrawalFlowView: View {
                 } else {
                     VStack(alignment: .leading, spacing: 20) {
                         Text("Withdraw from Study").font(.system(.largeTitle, design: .rounded, weight: .light))
-                        Text("Choose what should happen to this study’s local app data.")
+                        Text("Choose what should happen to the data you’ve shared with this study.")
                             .foregroundStyle(InoxityTheme.secondaryText)
                         option(.keepExistingData, title: "Withdraw and Keep Existing Data",
-                               detail: "Stops future Inoxity queries and reminders while preserving this study’s local survey and media records.")
+                               detail: "Stops all data collection and reminders. Data you’ve already sent to the research team is kept and may still be used in the study.")
                         option(.deleteExistingData, title: "Withdraw and Delete Existing Data",
-                               detail: "Deletes this study’s local app records and media. Apple Health records are not deleted, and no server deletion is claimed.")
+                               detail: "Stops all data collection and reminders, and deletes the data you’ve sent to this study — Apple Health data, survey records, and uploaded media — from the research team’s database and from this phone.")
+                        // Server-side deletion is submit_withdrawal_request (study backend migration 009).
+                        Text("Either way, the Health app’s own data on your phone isn’t changed.")
+                            .font(.footnote).foregroundStyle(InoxityTheme.secondaryText)
                         SecondaryButton(title: "Cancel") { dismiss() }
                         if let error = state.withdrawalErrorMessage { ErrorMessageView(message: error) }
                     }.foregroundStyle(InoxityTheme.primaryText)
@@ -45,9 +48,13 @@ struct WithdrawalFlowView: View {
             InoxityCard { VStack(alignment: .leading, spacing: 8) { Text(title).font(.headline); Text(detail).font(.subheadline).foregroundStyle(InoxityTheme.secondaryText) } }
         }.buttonStyle(.plain)
     }
-    private var confirmationTitle: String { choice == .deleteExistingData ? "Delete local study data and withdraw?" : "Keep local study data and withdraw?" }
+    private var confirmationTitle: String { choice == .deleteExistingData ? "Delete your study data and withdraw?" : "Keep your study data and withdraw?" }
     private var confirmButtonTitle: String { choice == .deleteExistingData ? "Delete Data and Withdraw" : "Keep Data and Withdraw" }
-    private var confirmationMessage: String { choice == .deleteExistingData ? "This removes only the active study’s local Inoxity data. It cannot delete Apple Health or server data." : "Future Inoxity collection and reminders stop, while existing local data remains on this device." }
+    private var confirmationMessage: String {
+        choice == .deleteExistingData
+            ? "This permanently deletes this study’s data from the research team’s database and from this phone, as soon as your phone is online. It can’t be undone. Survey answers stored in the survey tool itself and copies the team has already downloaded aren’t affected; contact the research team about those."
+            : "Data collection and reminders stop. Data you’ve already sent to the research team is kept."
+    }
 
     @ViewBuilder
     private func outcomePanel(_ outcome: AppState.WithdrawalOutcome) -> some View {

@@ -19,8 +19,13 @@ struct SurveyOccurrenceBuilder: Sendable {
         let futureEnd = calendar.date(byAdding: .day, value: policy.futureDays, to: now) ?? now
         let studyStart = date(configuration.schedule.startDate, calendar: calendar) ?? participant.enrollmentDate
         let studyEnd = endOfDay(configuration.schedule.endDate, calendar: calendar) ?? futureEnd
+        // Same per-participant end as NotificationScheduleBuilder, so no survey occurs after the
+        // participant's study is over.
+        let durationEnd = StudyProgress.participantCollectionEnd(
+            startDate: ParticipantStartDateResolver.resolve(schedule: configuration.schedule, participant: participant, calendar: calendar),
+            participantDurationDays: configuration.schedule.participantDurationDays, calendar: calendar)
         let lower = [historyStart, participant.enrollmentDate, participantCollectionStart, studyStart].compactMap { $0 }.max() ?? historyStart
-        let upper = [futureEnd, participantCollectionEnd, studyEnd].compactMap { $0 }.min() ?? futureEnd
+        let upper = [futureEnd, participantCollectionEnd, studyEnd, durationEnd].compactMap { $0 }.min() ?? futureEnd
         guard lower <= upper else { return [] }
 
         var result = [SurveyOccurrence](), seen = Set<String>()
@@ -34,18 +39,13 @@ struct SurveyOccurrenceBuilder: Sendable {
                 guard seen.insert(id).inserted else { throw StudyConfigurationError.duplicateID(id) }
                 let opens = calendar.date(byAdding: .minute, value: -survey.availabilityWindow.opensMinutesBefore, to: scheduled) ?? scheduled
                 let closes = calendar.date(byAdding: .minute, value: survey.availabilityWindow.closesMinutesAfter, to: scheduled) ?? scheduled
-                // A softer, adherence-tracking-only deadline — never later than `closes`, which
-                // alone still governs whether the occurrence can actually be opened/completed.
-                // See `status(...)`: only applies while the occurrence has never been opened.
-                let missedDeadline = survey.promptExpirationMinutes
-                    .flatMap { calendar.date(byAdding: .minute, value: $0, to: opens) }
-                    .map { min($0, closes) } ?? closes
                 let persisted = participant.surveyOccurrenceStates[id]
                 if let persisted, persisted.surveyID != survey.id || abs(persisted.scheduledFor.timeIntervalSince(scheduled)) >= 1 {
                     throw SurveyRuntimeError.inconsistentPersistedState
                 }
-                let status = status(now: now, opens: opens, closes: closes, missedDeadline: missedDeadline,
-                                    persisted: persisted, eligible: participant.participationStatus == .enrolled)
+                let status = status(now: now, opens: opens, closes: closes, persisted: persisted,
+                                    eligible: participant.participationStatus == .enrolled,
+                                    tracksCompletion: survey.completionCallback.enabled)
                 result.append(.init(id: id, studyID: configuration.identity.id, surveyID: survey.id,
                                     name: survey.name, summary: survey.description, instructions: survey.instructions,
                                     privacyText: survey.privacyText, presentationMode: survey.presentationMode,
@@ -69,20 +69,21 @@ struct SurveyOccurrenceBuilder: Sendable {
         return occurrences(schedule: schedule, lower: lower, upper: upper, calendar: calendar, participant: participant, studyID: studyID, seedKey: seedKey)
     }
 
-    /// `missedDeadline`: a softer adherence-tracking cutoff (see `promptExpirationMinutes`),
-    /// always `<= closes` — only ever consulted while the occurrence has never been opened, via
-    /// either entry path (tapping the notification or navigating to it directly from the Surveys
-    /// tab — both stamp `openedAt` identically, see `AppState.persistSurveyOpened`), so opening it
-    /// either way before this deadline correctly keeps it from ever reading as "missed" for that
-    /// reason. `closes` (the hard availability-window cutoff) still wins regardless of
-    /// `openedAt` once reached, unchanged from before this field existed.
-    private func status(now: Date, opens: Date, closes: Date, missedDeadline: Date, persisted: PersistedSurveyOccurrenceState?, eligible: Bool) -> SurveyOccurrenceStatus {
+    /// The availability window (`opens`...`closes`) is the only rule: a survey can be opened and
+    /// completed inside it and not outside it. `promptExpirationMinutes` is deliberately ignored.
+    /// It only ever labelled occurrences on the phone (it never reaches the study's data), and
+    /// counted from `opens` it blocked surveys hours before their notification arrived. Lateness
+    /// can be computed from the uploaded `scheduled_for` and `opened_at` instead.
+    /// `tracksCompletion` false: the survey never reports completion back, so a started survey
+    /// whose window has closed is `.done` rather than `.missed` — otherwise every started survey
+    /// would eventually read as missed.
+    private func status(now: Date, opens: Date, closes: Date, persisted: PersistedSurveyOccurrenceState?,
+                        eligible: Bool, tracksCompletion: Bool) -> SurveyOccurrenceStatus {
         if persisted?.completedAt != nil { return .completed }
         guard eligible else { return .unavailable }
         if now < opens { return .upcoming }
-        if now > closes { return .missed }
-        guard persisted?.openedAt == nil else { return .opened }
-        return now > missedDeadline ? .missed : .available
+        if now > closes { return persisted?.openedAt != nil && !tracksCompletion ? .done : .missed }
+        return persisted?.openedAt == nil ? .available : .opened
     }
 
     // studyID/seedKey: only consulted for `.randomWindow` schedules, to seed

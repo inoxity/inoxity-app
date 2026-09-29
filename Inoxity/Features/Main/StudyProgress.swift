@@ -66,6 +66,20 @@ enum StudyProgress: Equatable {
         return Self.dayNumber(startDate: startDate, calendar: calendar, now: now) > total
     }
 
+    /// The last moment of the participant's final study day (the end of day `participantDurationDays`),
+    /// or `nil` when there's no fixed duration or no resolved start date yet. The same boundary as
+    /// `isPastParticipantDuration`: one second later it turns true. Reminders and surveys are
+    /// bounded by this so they stop when the participant's study does.
+    static func participantCollectionEnd(
+        startDate: Date?,
+        participantDurationDays: Int?,
+        calendar: Calendar = .current
+    ) -> Date? {
+        guard let startDate, let total = participantDurationDays, total > 0,
+              let dayAfterLast = calendar.date(byAdding: .day, value: total, to: calendar.startOfDay(for: startDate)) else { return nil }
+        return dayAfterLast.addingTimeInterval(-1)
+    }
+
     // Day 1 = the calendar day of the resolved start date. Callers are expected to have already
     // checked `now >= startDate` (see `current(...)`/`isPastParticipantDuration` above) — this no
     // longer clamps a negative `daysElapsed` up to day 1 itself, since that used to silently

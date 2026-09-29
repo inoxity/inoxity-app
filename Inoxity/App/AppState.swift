@@ -21,14 +21,15 @@ final class AppState: ObservableObject {
     private let studyBackendClientFactory: (any StudyBackendClientFactory)?
     private let installationID: any InstallationIdentifying
     private let syncCoordinator: (any SyncCoordinating)?
+    private let healthKitBackgroundDelivery: (any HealthKitBackgroundDelivering)?
     private let backendEnvironment: BackendEnvironment?
     // Direct, one-off StudyBackendContext resolution for an already-enrolled participant —
     // used by uploadMediaDraft, mirroring how studyBackendClientFactory above is already used
     // directly (not via syncCoordinator) for the pre-enrollment registerParticipantID call.
     private let router: (any StudyBackendRouting)?
 
-    @Published private(set) var configuration: StudyConfiguration?
-    @Published private(set) var participantState: ParticipantState?
+    @Published private(set) var configuration: StudyConfiguration? { didSet { refreshHealthKitBackgroundDelivery() } }
+    @Published private(set) var participantState: ParticipantState? { didSet { refreshHealthKitBackgroundDelivery() } }
     @Published private(set) var isRestoring = true
     @Published private(set) var persistenceError: ParticipantStatePersistenceError?
     @Published private(set) var healthKitStatus: HealthKitRuntimeStatus = .notRequested
@@ -41,6 +42,9 @@ final class AppState: ObservableObject {
     @Published private(set) var surveySummary = SurveyRuntimeSummary()
     @Published private(set) var focusedSurveyOccurrenceID: String?
     @Published var activeSurveyPresentation: SurveyPresentationRequest?
+    /// The occurrence waiting on the "take your survey now?" confirmation (shown by RootView).
+    /// Each survey can be taken only once per window, so every way of starting one goes through it.
+    @Published private(set) var pendingSurveyStartID: String?
     @Published private(set) var surveyErrorMessage: String?
     @Published private(set) var mediaSummary = MediaRuntimeSummary()
     @Published private(set) var mediaErrorMessage: String?
@@ -54,6 +58,9 @@ final class AppState: ObservableObject {
     @Published private(set) var withdrawalErrorMessage: String?
     @Published private(set) var backendSyncResult: SyncResult?
     @Published private(set) var backendActionMessage: String?
+    /// The last enrollment failure, with its short code and "Copy error details" text. Shown by
+    /// StudyCodeView and ParticipantIDView; cleared when a new attempt starts.
+    @Published private(set) var enrollmentErrorReport: EnrollmentErrorReport?
     @Published private(set) var pendingWithdrawalCount = 0
     @Published private(set) var surveyEventDiagnostics: SurveyEventQueueDiagnostics = .empty
     @Published private(set) var newerConfigurationRevision: Int?
@@ -127,6 +134,7 @@ final class AppState: ObservableObject {
         studyBackendClientFactory = container.studyBackendClientFactory
         installationID = container.installationID
         syncCoordinator = container.syncCoordinator
+        healthKitBackgroundDelivery = container.healthKitBackgroundDelivery
         backendEnvironment = container.backendEnvironment
         router = container.router
         // Wired synchronously here, not from a SwiftUI `.task` — on a cold launch triggered by
@@ -246,6 +254,35 @@ final class AppState: ObservableObject {
     }
 
     func enroll(with code: String) async throws {
+        try await withEnrollmentDiagnostics { try await self.performEnroll(with: code) }
+    }
+
+    /// Runs one enrollment step with its own failure recorder (see `EnrollmentDiagnostics`) and,
+    /// if it fails, publishes a coded report and prints the details to the Xcode console.
+    private func withEnrollmentDiagnostics<T>(_ operation: () async throws -> T) async throws -> T {
+        enrollmentErrorReport = nil
+        let recorder = EnrollmentDiagnosticsRecorder()
+        do {
+            return try await EnrollmentDiagnostics.$recorder.withValue(recorder) { try await operation() }
+        } catch WithdrawalError.retainedDataRequiresDecision {
+            throw WithdrawalError.retainedDataRequiresDecision   // handled by its own sheet, not an error
+        } catch {
+            let report = EnrollmentErrorReport.make(from: error, notes: recorder.notes, at: currentDate())
+            enrollmentErrorReport = report
+            #if DEBUG
+            print("[Inoxity enrollment error]\n" + enrollmentErrorCopyText(report))
+            #endif
+            throw error
+        }
+    }
+
+    func enrollmentErrorCopyText(_ report: EnrollmentErrorReport) -> String {
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
+        return report.copyText(studyCode: configuration?.identity.code ?? pendingResolvedStudy?.normalizedStudyCode,
+                               appVersion: "\(Self.appVersion) (\(build))", environment: backendEnvironment?.name.rawValue)
+    }
+
+    private func performEnroll(with code: String) async throws {
         backendActionMessage = "Checking study…"
         let loadedConfiguration: StudyConfiguration
         if let remoteFirst = provider as? RemoteFirstStudyConfigurationProvider {
@@ -291,7 +328,7 @@ final class AppState: ObservableObject {
         backendActionMessage = "Connecting securely…"
         do {
             let installationIdentifier = installationID
-            let remote = try await Self.withTimeout(seconds: Self.backendCallTimeoutSeconds) {
+            let remote = try await withEnrollmentDiagnostics { try await Self.withTimeout(seconds: Self.backendCallTimeoutSeconds) {
                 let context = try await factory.context(for: resolution)
                 guard context.identity == resolution.validatedIdentity else { throw BackendError.backendIdentityMismatch }
                 let installation = try await installationIdentifier.installationID()
@@ -300,7 +337,7 @@ final class AppState: ObservableObject {
                     participantIdentifier: validated, enrollmentAttemptID: attempt, installationID: installation,
                     configurationSchemaVersion: resolution.configurationSchemaVersion,
                     configurationRevision: resolution.configurationRevision))
-            }
+            } }
             backendActionMessage = "Registering enrollment…"
             let state = ParticipantState(participantUUID: UUID(), studyID: configuration.identity.id,
                 externalParticipantID: validated, onboardingStep: pendingOnboardingStep,
@@ -316,7 +353,7 @@ final class AppState: ObservableObject {
             try stateStore.saveState(state); stateStore.setActiveStudyCode(configuration.identity.code)
             participantState = state; backendActionMessage = "Enrollment registered"; return true
         } catch {
-            backendActionMessage = message(for: error); return false
+            backendActionMessage = enrollmentErrorReport?.message ?? message(for: error); return false
         }
     }
 
@@ -376,6 +413,7 @@ final class AppState: ObservableObject {
         do { event = try await withdrawalService.withdraw(participantState, choice: choice) }
         catch { withdrawalErrorMessage = message(for: error); return .failed }
         clearActiveEnrollmentRuntime(); withdrawalFlowPresented = false
+        healthKitBackgroundDelivery?.observe(identifiers: [])
         // The real sync keeps running in the background regardless of whether the bounded wait
         // below times out — it is NOT the thing being raced/cancelled, so a slow-but-eventually-
         // successful sync still completes even after this function returns.
@@ -562,6 +600,10 @@ final class AppState: ObservableObject {
     }
 
     func applicationDidBecomeActive() async {
+        // Foundation caches TimeZone.current until this is called. The NSSystemTimeZoneDidChange
+        // handler in InoxityApp resets it too, but that event can be missed while the app is
+        // suspended, and a stale zone here would reconcile reminders against the old zone.
+        NSTimeZone.resetSystemTimeZone()
         await refreshNotificationStatus(reconcileIfNeeded: true)
         refreshSurveyRuntime()
         processPendingSurveyCallbackIfPossible()
@@ -597,6 +639,7 @@ final class AppState: ObservableObject {
             group.addTask { try await operation() }
             group.addTask {
                 try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+                EnrollmentDiagnostics.record(detail: "No response within \(Int(seconds)) seconds", stage: .registration)
                 throw BackendError.unavailable
             }
             let result = try await group.next()!
@@ -741,13 +784,45 @@ final class AppState: ObservableObject {
         }
     }
 
+    /// Asks the participant to confirm before starting a survey (see `pendingSurveyStartID`).
+    func requestSurveyStart(_ occurrenceID: String) {
+        refreshSurveyRuntime()
+        guard let occurrence = surveySummary.occurrences.first(where: { $0.id == occurrenceID }) else {
+            // e.g. a notification for an occurrence that has since dropped out of the schedule.
+            focusedSurveyOccurrenceID = nil; surveyErrorMessage = "The requested survey is no longer available."; return
+        }
+        guard occurrence.status.canStart else {
+            focusedSurveyOccurrenceID = nil; surveyErrorMessage = Self.cannotStartMessage(occurrence.status); return
+        }
+        surveyErrorMessage = nil
+        focusedSurveyOccurrenceID = occurrenceID
+        pendingSurveyStartID = occurrenceID
+    }
+
+    func confirmSurveyStart(_ occurrenceID: String) async {
+        pendingSurveyStartID = nil
+        await openSurveyOccurrence(occurrenceID)
+    }
+
+    func cancelSurveyStart() { pendingSurveyStartID = nil }
+
+    private static func cannotStartMessage(_ status: SurveyOccurrenceStatus?) -> String {
+        switch status {
+        case .opened: "You’ve already started this survey. Each survey can only be taken once."
+        case .completed: "You’ve already completed this survey."
+        default: SurveyRuntimeError.unavailableOccurrence.localizedDescription
+        }
+    }
+
+    /// Starts the survey. Only reachable for a startable occurrence: a survey that has already
+    /// been opened can't be opened again, whichever screen asks.
     func openSurveyOccurrence(_ occurrenceID: String) async {
         refreshSurveyRuntime()
+        let occurrence = surveySummary.occurrences.first(where: { $0.id == occurrenceID })
         guard participantState?.participationStatus != .withdrawn,
-              let configuration, let occurrence = surveySummary.occurrences.first(where: { $0.id == occurrenceID }),
-              occurrence.status == .available || occurrence.status == .opened,
+              let configuration, let occurrence, occurrence.status.canStart,
               let survey = configuration.surveys.first(where: { $0.id == occurrence.surveyID && $0.enabled }) else {
-            surveyErrorMessage = SurveyRuntimeError.unavailableOccurrence.localizedDescription; return
+            surveyErrorMessage = Self.cannotStartMessage(occurrence?.status); return
         }
         do {
             let url = try SurveyURLBuilder.build(baseURL: survey.url, studyID: configuration.identity.id,
@@ -958,6 +1033,19 @@ final class AppState: ObservableObject {
         return migrated
     }
 
+    /// Keeps HealthKit background delivery in step with whether this participant's Apple Health
+    /// data can actually sync — the same gates HealthKitUploadCoordinator.synchronize applies.
+    /// Skipped while either value is nil: that's a launch still restoring (configuration and
+    /// participantState are assigned one after the other) and must not switch off the observers
+    /// the app delegate already resumed. Withdrawal stops them explicitly instead.
+    private func refreshHealthKitBackgroundDelivery() {
+        guard let healthKitBackgroundDelivery, let configuration, let participantState else { return }
+        let eligible = configuration.healthKit.enabled && participantState.participationStatus == .enrolled
+            && participantState.healthKitRequestState == .requestCompleted
+            && participantState.enrollmentSyncStatus == .registered && participantState.backendRoutingStatus == .registered
+        healthKitBackgroundDelivery.observe(identifiers: eligible ? configuration.healthKit.identifiers : [])
+    }
+
     private func updateParticipantState(_ mutation: (inout ParticipantState) -> Void) {
         guard var state = participantState else { return }
         mutation(&state)
@@ -1051,19 +1139,12 @@ final class AppState: ObservableObject {
         guard let route = pendingSurveyRoute else { return }
         let candidates = surveySummary.occurrences.filter { $0.surveyID == route.surveyID }
         if let id = route.occurrenceID {
-            guard let occurrence = candidates.first(where: { $0.id == id }),
-                  occurrence.status == .available || occurrence.status == .opened else {
-                focusedSurveyOccurrenceID = nil; pendingSurveyRoute = nil
-                surveyErrorMessage = "The requested survey is no longer available."
-                return
-            }
-            focusedSurveyOccurrenceID = id; pendingSurveyRoute = nil
-            // A notification tap always carries the specific occurrence — open it
-            // directly rather than just scrolling/highlighting its card in the
-            // Surveys list and waiting for a second manual tap.
-            Task { await openSurveyOccurrence(id) }
+            pendingSurveyRoute = nil
+            // A notification tap carries the specific occurrence: ask the same "take it now?"
+            // confirmation as the Surveys tab, rather than starting it straight away.
+            requestSurveyStart(id)
         } else {
-            let available = candidates.filter { $0.status == .available || $0.status == .opened }
+            let available = candidates.filter { $0.status.canStart }
             focusedSurveyOccurrenceID = available.count == 1 ? available[0].id : nil
         }
     }

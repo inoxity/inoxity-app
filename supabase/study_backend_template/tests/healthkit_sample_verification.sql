@@ -1,4 +1,4 @@
--- STUDY DATA BACKEND ONLY — run after migrations 001-006 with disposable fake participants.
+-- STUDY DATA BACKEND ONLY — run after migrations 001-006 and 012 with disposable fake participants.
 begin;
 do $$ begin
  if not (select relrowsecurity from pg_class where oid='public.healthkit_samples'::regclass) then raise exception 'HealthKit RLS disabled'; end if;
@@ -16,7 +16,7 @@ insert into public.study_enrollments(id,participant_id,participant_identifier,en
  ('40000000-0000-0000-0000-000000000102','40000000-0000-0000-0000-000000000002','FAKE-B','40000000-0000-0000-0000-000000000202','40000000-0000-0000-0000-000000000302',5,1);
 set local role authenticated;
 select set_config('request.jwt.claim.sub','40000000-0000-0000-0000-000000000011',true);
-do $$ declare m public.study_backend_metadata%rowtype; sample jsonb; first_id uuid; retry_id uuid; begin
+do $$ declare m public.study_backend_metadata%rowtype; sample jsonb; first_id uuid; retry_id uuid; revision_id uuid; begin
  select * into m from public.study_backend_metadata where singleton;
  sample := jsonb_build_array(jsonb_build_object('client_sample_id','healthkit.fake.40000000-0000-0000-0000-000000000501','sample_uuid','40000000-0000-0000-0000-000000000501','health_type_identifier','stepCount','sample_kind','quantity','sample_start','2026-01-01T00:00:00Z','sample_end','2026-01-01T01:00:00Z','numeric_value',100,'canonical_unit','count','configuration_schema_version',5,'configuration_revision',1));
  begin perform * from public.submit_healthkit_samples(m.backend_instance_id,m.stable_study_id,'40000000-0000-0000-0000-000000000102',sample); raise exception 'foreign HealthKit enrollment accepted'; exception when insufficient_privilege then null; end;
@@ -25,6 +25,9 @@ do $$ declare m public.study_backend_metadata%rowtype; sample jsonb; first_id uu
  select acknowledgment_id into first_id from public.submit_healthkit_samples(m.backend_instance_id,m.stable_study_id,'40000000-0000-0000-0000-000000000101',sample);
  select acknowledgment_id into retry_id from public.submit_healthkit_samples(m.backend_instance_id,m.stable_study_id,'40000000-0000-0000-0000-000000000101',sample);
  if first_id<>retry_id then raise exception 'HealthKit retry not idempotent'; end if;
+ -- 012: a re-send after a configuration republish differs only in configuration_revision.
+ select acknowledgment_id into revision_id from public.submit_healthkit_samples(m.backend_instance_id,m.stable_study_id,'40000000-0000-0000-0000-000000000101',jsonb_set(sample,'{0,configuration_revision}','2'));
+ if revision_id is distinct from first_id then raise exception 'HealthKit re-send after config republish not idempotent'; end if;
  begin perform * from public.submit_healthkit_samples(m.backend_instance_id,m.stable_study_id,'40000000-0000-0000-0000-000000000101',jsonb_set(sample,'{0,numeric_value}','101')); raise exception 'conflicting HealthKit retry accepted'; exception when unique_violation then null; end;
 end $$;
 reset role;

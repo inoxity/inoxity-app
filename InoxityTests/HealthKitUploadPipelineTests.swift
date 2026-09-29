@@ -115,6 +115,122 @@ final class HealthKitUploadPipelineTests: XCTestCase {
         let records = await queue.records(studyID: "study"), cursor = await cursors.cursor(for: cursorKey()), submissions = await repo.submissions()
         XCTAssertTrue(records.isEmpty); XCTAssertNotNil(cursor?.committedAnchor); XCTAssertEqual(submissions, 0)
     }
+    func testSynchronizeDrainsAllAvailableQueryPages() async throws {
+        let defaults = temporaryDefaults(); let queue = UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-pages")
+        let cursors = UserDefaultsHealthKitSyncCursorStore(defaults: defaults, key: "c-pages")
+        let query = PagedRawQuery(pages: [
+            .init(samples: [], nextAnchor: Data([1]), hasMore: true, ignoredDeletionCount: 1),
+            .init(samples: [], nextAnchor: Data([2]), hasMore: false, ignoredDeletionCount: 1)
+        ])
+        let coordinator = HealthKitUploadCoordinator(query: query, queue: queue, cursors: cursors)
+        _ = await coordinator.synchronize(state: participant(), configuration: try await configuration(), repository: MockHealthRepository(acknowledge: true))
+        let cursor = await cursors.cursor(for: cursorKey())
+        let callCount = await query.callCount(identifier: "stepCount")
+        XCTAssertEqual(callCount, 2)
+        XCTAssertEqual(cursor?.committedAnchor, Data([2]))
+        XCTAssertNil(cursor?.candidateAnchor)
+    }
+    func testRejectedSampleIsSetAsideWithoutBlockingItsBatchOrCursor() async throws {
+        let defaults = temporaryDefaults(); let queue = UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-reject")
+        let cursors = UserDefaultsHealthKitSyncCursorStore(defaults: defaults, key: "c-reject")
+        let uuids = (1...5).map { UUID(uuidString: "AAAAAAAA-0000-0000-0000-00000000000\($0)")! }
+        let bad = HealthKitSampleIdentityFactory.id(studyID: "study", identifier: "stepCount", sampleUUID: uuids[2])
+        let repo = ScriptedHealthRepository { batch in
+            if batch.contains(where: { $0.clientSampleID == bad }) { throw HealthKitUploadError.invalidSample }
+        }
+        let coordinator = HealthKitUploadCoordinator(query: IdentifierScopedQuery(samples: uuids.map { raw(uuid: $0, identifier: "stepCount") }),
+                                                     queue: queue, cursors: cursors)
+        _ = await coordinator.synchronize(state: participant(), configuration: try await configuration(), repository: repo)
+        let records = await queue.records(studyID: "study"), diagnostics = await queue.diagnostics(studyID: "study")
+        XCTAssertEqual(records.map(\.clientSampleID), [bad], "acknowledged samples are pruned; only the rejected one stays")
+        XCTAssertEqual(records.first?.syncStatus, .attentionRequired); XCTAssertEqual(records.first?.setAsideAfterRejection, true)
+        XCTAssertEqual(diagnostics.acknowledged, 4); XCTAssertEqual(diagnostics.attentionRequired, 1)
+        let cursor = await cursors.cursor(for: cursorKey())
+        XCTAssertNotNil(cursor?.committedAnchor); XCTAssertNil(cursor?.candidateAnchor)
+        // Set aside for good: a later pass doesn't re-send it.
+        let before = await repo.batchCount()
+        _ = await coordinator.synchronize(state: participant(), configuration: try await configuration(), repository: repo)
+        let after = await repo.batchCount(); XCTAssertEqual(after, before)
+    }
+    func testRetryableFailureInOneMetricDoesNotBlockAnother() async throws {
+        let defaults = temporaryDefaults(); let queue = UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-metrics")
+        let cursors = UserDefaultsHealthKitSyncCursorStore(defaults: defaults, key: "c-metrics")
+        let repo = ScriptedHealthRepository { batch in
+            if batch.contains(where: { $0.healthKitIdentifier == "activeEnergyBurned" }) { throw HealthKitUploadError.unavailable }
+        }
+        let samples = [raw(uuid: UUID(), identifier: "activeEnergyBurned", start: 1), raw(uuid: UUID(), identifier: "stepCount", start: 2)]
+        let coordinator = HealthKitUploadCoordinator(query: IdentifierScopedQuery(samples: samples), queue: queue, cursors: cursors)
+        _ = await coordinator.synchronize(state: participant(), configuration: try await configuration(), repository: repo)
+        let steps = await cursors.cursor(for: cursorKey(identifier: "stepCount"))
+        let energy = await cursors.cursor(for: cursorKey(identifier: "activeEnergyBurned"))
+        XCTAssertNotNil(steps?.committedAnchor); XCTAssertNil(steps?.candidateAnchor)
+        XCTAssertNil(energy?.committedAnchor); XCTAssertNotNil(energy?.candidateAnchor)
+        let pending = await queue.records(studyID: "study")
+        XCTAssertEqual(pending.map(\.healthKitIdentifier), ["activeEnergyBurned"]); XCTAssertEqual(pending.first?.syncStatus, .retryableFailure)
+    }
+    func testSystemicFailureLeavesRecordsForRetryAndCursorUnpromoted() async throws {
+        let defaults = temporaryDefaults(); let queue = UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-systemic")
+        let cursors = UserDefaultsHealthKitSyncCursorStore(defaults: defaults, key: "c-systemic")
+        let repo = ScriptedHealthRepository { _ in throw BackendError.ownershipDenied }
+        let coordinator = HealthKitUploadCoordinator(query: IdentifierScopedQuery(samples: [raw(uuid: UUID(), identifier: "stepCount")]),
+                                                     queue: queue, cursors: cursors)
+        _ = await coordinator.synchronize(state: participant(), configuration: try await configuration(), repository: repo)
+        let records = await queue.records(studyID: "study"), cursor = await cursors.cursor(for: cursorKey())
+        XCTAssertEqual(records.map(\.syncStatus), [.pending]); XCTAssertEqual(records.first?.setAsideAfterRejection, nil)
+        XCTAssertNil(cursor?.committedAnchor); XCTAssertNotNil(cursor?.candidateAnchor)
+    }
+    func testLegacyAttentionRequiredRecordGetsAnotherAttempt() async throws {
+        let defaults = temporaryDefaults(); let queue = UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-legacy")
+        let cursors = UserDefaultsHealthKitSyncCursorStore(defaults: defaults, key: "c-legacy")
+        // What a batch-wide non-retryable failure left behind before setAsideAfterRejection existed.
+        var stuck = try HealthKitSampleNormalizer.normalize(raw(uuid: UUID(), identifier: "stepCount"), participant: participant(), now: Date())
+        stuck.syncStatus = .attentionRequired; stuck.retryCount = 7
+        try await queue.enqueue([stuck])
+        let repo = ScriptedHealthRepository { _ in }
+        let coordinator = HealthKitUploadCoordinator(query: IdentifierScopedQuery(samples: []), queue: queue, cursors: cursors)
+        _ = await coordinator.synchronize(state: participant(), configuration: try await configuration(), repository: repo)
+        let diagnostics = await queue.diagnostics(studyID: "study")
+        XCTAssertEqual(diagnostics.acknowledged, 1); XCTAssertEqual(diagnostics.attentionRequired, 0)
+    }
+    func testPruneKeepsCursorRequiredIDsAndDiagnosticsSurviveReload() async throws {
+        let defaults = temporaryDefaults(); let queue = UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-prune")
+        var records = try [UUID(), UUID(), UUID()].map { try HealthKitSampleNormalizer.normalize(raw(uuid: $0, identifier: "stepCount"), participant: participant(), now: Date()) }
+        let acknowledgedAt = Date(timeIntervalSince1970: 500)
+        for index in 0..<2 { records[index].syncStatus = .acknowledged; records[index].acknowledgedAt = acknowledgedAt }
+        try await queue.enqueue(records)
+        try await queue.pruneAcknowledged(studyID: "study", keeping: [records[1].clientSampleID])
+        let remaining = await queue.records(studyID: "study")
+        XCTAssertEqual(Set(remaining.map(\.clientSampleID)), [records[1].clientSampleID, records[2].clientSampleID])
+        let reloaded = UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-prune")
+        let diagnostics = await reloaded.diagnostics(studyID: "study")
+        XCTAssertEqual(diagnostics.acknowledged, 2); XCTAssertEqual(diagnostics.pending, 1)
+        XCTAssertEqual(diagnostics.lastSuccessfulUpload, acknowledgedAt)
+        try await reloaded.reset(studyID: "study")
+        let cleared = await reloaded.diagnostics(studyID: "study"); XCTAssertEqual(cleared, .empty)
+    }
+    func testCollectionStopsAtNoonAfterTheParticipantsLastStudyDay() async throws {
+        let defaults = temporaryDefaults(), capture = CapturingQuery()
+        let enrolled = Date(timeIntervalSince1970: 1_790_000_000), now = enrolled.addingTimeInterval(30 * 86_400)
+        let coordinator = HealthKitUploadCoordinator(query: capture, queue: UserDefaultsHealthKitUploadQueue(defaults: defaults, key: "q-end"),
+                                                     cursors: UserDefaultsHealthKitSyncCursorStore(defaults: defaults, key: "c-end"), now: { now })
+        let config = try await configuration(schemaVersion: 7, backfillDays: 30, participantDurationDays: 3)
+        _ = await coordinator.synchronize(state: participant(enrollmentDate: enrolled), configuration: config,
+                                          repository: MockHealthRepository(acknowledge: true))
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = .current
+        let lastMoment = try XCTUnwrap(StudyProgress.participantCollectionEnd(startDate: enrolled, participantDurationDays: 3, calendar: calendar))
+        // Noon the day after the last study day, so the final night of sleep is captured whole.
+        let expected = try XCTUnwrap(calendar.date(byAdding: .hour, value: 12, to: lastMoment.addingTimeInterval(1)))
+        XCTAssertEqual(calendar.component(.hour, from: expected), 12)
+        let end = await capture.lastEnd
+        XCTAssertEqual(end, expected, "the query window must stop at noon after the participant's last day, not now")
+    }
+    func testBackendSampleRejectionsMapToNonRetryableErrors() {
+        struct ServerError: Error, CustomStringConvertible { let description: String }
+        XCTAssertEqual(SupabaseBackendErrorMapper.healthKitSampleRejection(ServerError(description: "PostgrestError(message: \"invalid quantity sample\")")), .invalidSample)
+        XCTAssertEqual(SupabaseBackendErrorMapper.healthKitSampleRejection(ServerError(description: "conflicting duplicate identity")), .conflictingDuplicate)
+        XCTAssertNil(SupabaseBackendErrorMapper.healthKitSampleRejection(ServerError(description: "relation \"public.step_count_samples\" does not exist")))
+        XCTAssertNil(SupabaseBackendErrorMapper.healthKitSampleRejection(URLError(.notConnectedToInternet)))
+    }
     func testPolicyIsCentralizedAndBounded() {
         XCTAssertEqual(HealthKitUploadPolicy.phase3D.initialHistoryDays, 30)
         XCTAssertEqual(HealthKitUploadPolicy.phase3D.maximumQueryPageSize, 250)
@@ -191,20 +307,27 @@ final class HealthKitUploadPipelineTests: XCTestCase {
         studyBackendID: UUID(uuidString: "22222222-2222-2222-2222-222222222222"), studyBackendDescriptorCacheKey: "cache",
         studyBackendDescriptorRevision: 1, backendRoutingStatus: .registered)
     }
-    private func cursorKey(studyID: String = "study") -> HealthKitSyncCursorKey { .init(stableStudyID: studyID,
+    private func cursorKey(studyID: String = "study", identifier: String = "stepCount") -> HealthKitSyncCursorKey { .init(stableStudyID: studyID,
         remoteEnrollmentID: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, studyBackendID: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
-        descriptorCacheKey: "cache", healthKitIdentifier: "stepCount", configurationRevision: 1) }
+        descriptorCacheKey: "cache", healthKitIdentifier: identifier, configurationRevision: 1) }
+    private func raw(uuid: UUID, identifier: String, start: TimeInterval = 1) -> HealthKitRawSample { .init(uuid: uuid, identifier: identifier, kind: .quantity,
+        start: Date(timeIntervalSince1970: start), end: Date(timeIntervalSince1970: start + 1), timeZoneIdentifier: "America/Los_Angeles",
+        quantityValue: 1, canonicalUnit: HealthKitCanonicalUnit.forIdentifier(identifier), categoryValue: nil, workoutActivityType: nil, workoutDurationSeconds: nil) }
     private func configuration() async throws -> StudyConfiguration { try await BundledStudyConfigurationProvider(bundle: Bundle(for: Self.self)).configuration(for: "ACTIVITY02") }
     // Loads ActivityStudy.json (schedule.startDate == 2025-01-01) and overrides schemaVersion /
     // healthKit.backfillDays directly in the raw JSON before decoding, for testing Workstream
     // C's per-study backfill window without needing a dedicated fixture file per case.
-    private func configuration(schemaVersion: Int, backfillDays: Int?) async throws -> StudyConfiguration {
+    private func configuration(schemaVersion: Int, backfillDays: Int?, participantDurationDays: Int? = nil) async throws -> StudyConfiguration {
         let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "ActivityStudy", withExtension: "json"))
         var root = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
         root["schemaVersion"] = schemaVersion
         var healthKit = try XCTUnwrap(root["healthKit"] as? [String: Any])
         healthKit["backfillDays"] = backfillDays ?? NSNull()
         root["healthKit"] = healthKit
+        if let participantDurationDays {
+            var schedule = try XCTUnwrap(root["schedule"] as? [String: Any])
+            schedule["participantDurationDays"] = participantDurationDays; root["schedule"] = schedule
+        }
         return try JSONDecoder().decode(StudyConfiguration.self, from: JSONSerialization.data(withJSONObject: root))
     }
     private func temporaryDefaults() -> UserDefaults { let suite = "hk-upload-\(UUID())"; let value = UserDefaults(suiteName: suite)!; value.removePersistentDomain(forName: suite); return value }
@@ -216,13 +339,46 @@ private struct MockRawQuery: HealthKitSampleQuerying {
         .init(samples: samples, nextAnchor: Data([9]), hasMore: false, ignoredDeletionCount: deleted)
     }
 }
+// Returns only the samples for the identifier being queried, once — the second query for an
+// identifier (after its anchor advanced) comes back empty, like HealthKit's anchored query.
+private actor IdentifierScopedQuery: HealthKitSampleQuerying {
+    let samples: [HealthKitRawSample]
+    init(samples: [HealthKitRawSample]) { self.samples = samples }
+    func query(identifier: String, start: Date, end: Date, anchor: Data?, limit: Int) async throws -> HealthKitSampleQueryPage {
+        .init(samples: anchor == nil ? samples.filter { $0.identifier == identifier } : [], nextAnchor: Data(identifier.utf8),
+              hasMore: false, ignoredDeletionCount: 0)
+    }
+}
+// Acknowledges every batch unless `reject` throws for it.
+private actor ScriptedHealthRepository: HealthKitSampleUploadRepository {
+    let reject: @Sendable ([HealthKitSampleUpload]) throws -> Void; private var count = 0
+    init(reject: @escaping @Sendable ([HealthKitSampleUpload]) throws -> Void) { self.reject = reject }
+    func submitHealthKitSamples(_ samples: [HealthKitSampleUpload]) async throws -> HealthKitBatchAcknowledgment {
+        count += 1; try reject(samples)
+        return .init(acknowledgments: samples.map { .init(clientSampleID: $0.clientSampleID, acknowledgmentID: UUID(), receivedAt: Date(), idempotentExisting: false) })
+    }
+    func batchCount() -> Int { count }
+}
+// Serves the same page sequence to each identifier independently — the fixture study configures
+// several metrics, and each must drain its own pages.
+private actor PagedRawQuery: HealthKitSampleQuerying {
+    let pages: [HealthKitSampleQueryPage]
+    private var indices: [String: Int] = [:]
+    init(pages: [HealthKitSampleQueryPage]) { self.pages = pages }
+    func query(identifier: String, start: Date, end: Date, anchor: Data?, limit: Int) async throws -> HealthKitSampleQueryPage {
+        let index = indices[identifier, default: 0]; indices[identifier] = index + 1
+        return pages[min(index, pages.count - 1)]
+    }
+    func callCount(identifier: String) -> Int { indices[identifier, default: 0] }
+}
 // Records the `start` date `HealthKitUploadCoordinator.collectionStart` actually computed and
 // passed into the first query for the identifier under test — used by Workstream C's backfill
 // window tests, which care about that value rather than any returned samples.
 private actor CapturingQuery: HealthKitSampleQuerying {
     private(set) var lastStart: Date?
+    private(set) var lastEnd: Date?
     func query(identifier: String, start: Date, end: Date, anchor: Data?, limit: Int) async throws -> HealthKitSampleQueryPage {
-        lastStart = start
+        lastStart = start; lastEnd = end
         return .init(samples: [], nextAnchor: Data([9]), hasMore: false, ignoredDeletionCount: 0)
     }
 }

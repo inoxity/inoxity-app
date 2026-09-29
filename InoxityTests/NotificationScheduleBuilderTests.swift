@@ -34,6 +34,24 @@ final class NotificationScheduleBuilderTests: XCTestCase {
         XCTAssertTrue(plan.requests.allSatisfy { $0.fireDate >= self.date(2026,7,29) && $0.fireDate <= self.date(2026,7,31,23) })
     }
 
+    func testParticipantDurationStopsRemindersAfterTheParticipantsLastDay() throws {
+        let config = try withParticipantDuration(3)
+        // Enrollment start mode: days 1-3 are Jul 24-26, so nothing may fire from Jul 27 on.
+        let participant = ParticipantState(studyID: config.identity.id, enrollmentDate: date(2026,7,24,8))
+        let active = try NotificationScheduleBuilder().build(configuration: config, participant: participant, now: date(2026,7,24,8), timeZone: zone)
+        XCTAssertFalse(active.requests.isEmpty)
+        XCTAssertTrue(active.requests.allSatisfy { $0.fireDate < self.date(2026,7,27) })
+        let finished = try NotificationScheduleBuilder().build(configuration: config, participant: participant, now: date(2026,7,27,8), timeZone: zone)
+        XCTAssertTrue(finished.requests.isEmpty, "reminders must stop once the participant's study is over")
+    }
+
+    func testChangingParticipantDurationChangesFingerprint() throws {
+        let participant = ParticipantState(studyID: "sleep-cognition-v2", enrollmentDate: date(2026,7,24))
+        let builder = NotificationScheduleBuilder()
+        XCTAssertNotEqual(builder.fingerprint(configuration: try withParticipantDuration(3), participant: participant, timeZone: zone),
+                          builder.fingerprint(configuration: try withParticipantDuration(14), participant: participant, timeZone: zone))
+    }
+
     func testCompletedWithdrawnAndEmptyOrDisabledAreIneligible() throws {
         let config = try fixture("SleepStudy"), now = date(2026,7,24)
         for status in [ParticipationStatus.completed, .withdrawn] {
@@ -324,6 +342,11 @@ final class NotificationScheduleBuilderTests: XCTestCase {
 
     private func date(_ year: Int, _ month: Int, _ day: Int, _ hour: Int = 0) -> Date { var c = Calendar(identifier: .gregorian); c.timeZone = zone; return c.date(from: .init(year: year, month: month, day: day, hour: hour))! }
     private func fixture(_ name: String) throws -> StudyConfiguration { try decode(json(name)) }
+    private func withParticipantDuration(_ days: Int) throws -> StudyConfiguration {
+        var root = try json("SleepStudy"); var schedule = try XCTUnwrap(root["schedule"] as? [String: Any])
+        schedule["participantDurationDays"] = days; root["schedule"] = schedule
+        return try decode(root)
+    }
     private func json(_ name: String) throws -> [String:Any] { let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: name, withExtension: "json")); return try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String:Any]) }
     private func decode(_ root: [String:Any]) throws -> StudyConfiguration { try JSONDecoder().decode(StudyConfiguration.self, from: JSONSerialization.data(withJSONObject: root)) }
     private func mutateFirstReminder(_ root: inout [String:Any], _ mutation: (inout [String:Any])->Void) { var reminders = root["reminders"] as! [[String:Any]]; mutation(&reminders[0]); root["reminders"] = reminders }

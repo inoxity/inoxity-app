@@ -25,8 +25,18 @@ final class HealthKitService: HealthKitServicing {
     func requestStatus(for identifiers: Set<String>, includeCharacteristics: Bool) async throws -> HealthKitAuthorizationPreCheck {
         guard isHealthDataAvailable else { throw HealthKitServiceError.unavailable }
         guard !identifiers.isEmpty else { throw HealthKitServiceError.emptyReadSet }
-        var types = try Set(HealthKitTypeRegistry.types(for: identifiers).map(\.objectType))
-        if includeCharacteristics { types.formUnion(Self.characteristicTypes) }
+        // Deliberately excludes characteristicTypes and any .correlation-kind registry entry
+        // (currently just bloodPressure), unlike requestReadAuthorization below.
+        // getRequestStatusForAuthorization(toShare:read:) doesn't support HKCharacteristicType or
+        // HKCorrelationType in its type sets at all — passing either raises an uncatchable
+        // Objective-C exception from HealthKit's own
+        // `_throwIfAuthorizationDisallowedForSharing:types:` (crashes the process before the
+        // completion handler runs, so no Swift try/catch — even `try?` — can save it). This is
+        // only a pre-check for prompt-skipping messaging; requestReadAuthorization is the call
+        // that actually needs both of those in its read set, and that API does support them.
+        let types = try Set(HealthKitTypeRegistry.types(for: identifiers)
+            .filter { $0.sampleKind != .correlation }
+            .map(\.objectType))
         return try await withCheckedThrowingContinuation { continuation in
             healthStore.getRequestStatusForAuthorization(toShare: [], read: types) { status, error in
                 if let error {

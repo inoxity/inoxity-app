@@ -34,14 +34,16 @@ struct SettingsView: View {
                 mediaSection
                 diagnosticsSection
                 SecondaryButton(title: "Reset Enrollment") { state.beginWithdrawal() }
-                Text("Starts the withdrawal flow so you can choose whether to keep or delete this study’s local data.")
+                Text("Starts the withdrawal flow so you can choose whether to keep or delete the data you’ve sent to this study.")
                     .font(.footnote).foregroundStyle(InoxityTheme.secondaryText)
             }
             .foregroundStyle(InoxityTheme.primaryText)
         }
         .sheet(isPresented: $editingSleepSchedule) {
             if let sleepSchedule = configuration.sleepSchedule {
-                SleepScheduleView(configuration: sleepSchedule, progress: .init(current: 0, total: 1)) { wakeMinutes, bedMinutes in
+                SleepScheduleView(configuration: sleepSchedule, progress: .init(current: 0, total: 1),
+                                  savedWakeMinutes: state.participantState?.wakeTimeMinutes,
+                                  savedBedMinutes: state.participantState?.bedTimeMinutes) { wakeMinutes, bedMinutes in
                     state.saveSleepSchedule(wakeMinutes: wakeMinutes, bedMinutes: bedMinutes)
                     editingSleepSchedule = false
                 }
@@ -131,9 +133,9 @@ struct SettingsView: View {
                     settingsRow("Last completion", state.surveySummary.lastCompletionDate?.formatted(date: .abbreviated, time: .shortened) ?? "None")
                     if let message = state.surveyErrorMessage { Text(message).font(.footnote).foregroundStyle(InoxityTheme.secondaryText) }
                     SecondaryButton(title: "Refresh Survey Availability") { state.refreshSurveyRuntime() }
-                    let available = state.surveySummary.occurrences.filter { $0.status == .available || $0.status == .opened }
+                    let available = state.surveySummary.occurrences.filter { $0.status.canStart }
                     if available.count == 1 {
-                        SecondaryButton(title: "Open Current Survey") { Task { await state.openSurveyOccurrence(available[0].id) } }
+                        SecondaryButton(title: "Open Current Survey") { state.requestSurveyStart(available[0].id) }
                     }
                 }
             }

@@ -12,6 +12,15 @@ final class StudyProgressTests: XCTestCase {
         utc.date(from: DateComponents(year: year, month: month, day: day))!
     }
 
+    func testCollectionEndIsTheLastMomentBeforeTheStudyCountsAsComplete() throws {
+        let enrolled = date(2026, 1, 1)
+        let end = try XCTUnwrap(StudyProgress.participantCollectionEnd(startDate: enrolled, participantDurationDays: 14, calendar: utc))
+        XCTAssertEqual(end, date(2026, 1, 15).addingTimeInterval(-1))
+        XCTAssertFalse(StudyProgress.isPastParticipantDuration(startDate: enrolled, participantDurationDays: 14, calendar: utc, now: end))
+        XCTAssertTrue(StudyProgress.isPastParticipantDuration(startDate: enrolled, participantDurationDays: 14, calendar: utc, now: end.addingTimeInterval(1)))
+        XCTAssertNil(StudyProgress.participantCollectionEnd(startDate: enrolled, participantDurationDays: nil, calendar: utc))
+    }
+
     // Case 1 & 2: fixed participant duration, regardless of rolling vs. fixed-cohort enrollment —
     // both computed identically, relative to the participant's own enrollment date.
     func testDayOfNOnEnrollmentDay() {

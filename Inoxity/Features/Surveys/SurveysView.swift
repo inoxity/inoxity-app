@@ -15,7 +15,7 @@ struct SurveysView: View {
                     if configuration.surveys.filter(\.enabled).isEmpty {
                         InoxityCard { Text("This study does not currently use surveys.").foregroundStyle(InoxityTheme.secondaryText) }
                     } else {
-                        section("Available now", statuses: [.available, .late, .opened], empty: "No surveys are available right now.")
+                        section("Available now", statuses: [.available, .opened], empty: "No surveys are available right now.")
                         section("Upcoming", statuses: [.upcoming], empty: nil)
                         section("Completed recently", statuses: [.completed], empty: nil)
                         section("Missed recently", statuses: [.missed], empty: nil)

@@ -1,13 +1,10 @@
 import Foundation
 
 enum SurveyOccurrenceStatus: String, Equatable, Sendable {
-    /// `late`: never opened and past the survey's `promptExpirationMinutes` deadline, but still
-    /// before `closesAt`. That deadline is for adherence tracking only, so a late occurrence can
-    /// still be opened. `missed` means past `closesAt` and no longer openable.
-    case upcoming, available, late, opened, completed, missed, unavailable, outsideStudyWindow
+    case upcoming, available, opened, completed, missed, unavailable, outsideStudyWindow
 
     /// Whether the participant can open (or return to) the survey right now.
-    var isOpenable: Bool { self == .available || self == .late || self == .opened }
+    var isOpenable: Bool { self == .available || self == .opened }
 }
 
 struct SurveyOccurrence: Identifiable, Equatable, Sendable {

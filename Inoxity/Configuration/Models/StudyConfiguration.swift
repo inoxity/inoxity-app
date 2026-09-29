@@ -218,18 +218,10 @@ struct SurveyConfiguration: Codable, Equatable, Identifiable, Sendable {
     /// `name` (see `NotificationScheduleBuilder`). Ignored when `sendNotificationOnOpen` is false.
     let notificationTitle: String?
     let notificationBody: String?
-    /// If set, an occurrence is marked `.late` (see `SurveyOccurrenceBuilder.status`) once this
-    /// many minutes pass after the participant is first prompted without them opening it — a
-    /// softer, adherence-tracking deadline that can be shorter than
-    /// `availabilityWindow.closesMinutesAfter`, which alone still governs whether the occurrence
-    /// can actually still be opened/completed (a late occurrence still can). "Prompted" is the
-    /// first notification for the occurrence, or `opensAt` when nothing notifies — see
-    /// `SurveyOccurrenceBuilder.promptLeadMinutes`.
-    /// `nil` means only `closesMinutesAfter` governs "missed" (today's only-ever-possible
-    /// behavior before this field existed). Lived on `ReminderConfiguration` before schemaVersion
-    /// 8 — moved here since it's fundamentally about a survey occurrence's own deadline, not any
-    /// particular reminder announcing it. Mirrors `promptExpirationMinutes` on `surveySchema` in
-    /// the dashboard's study-schema.ts.
+    /// No longer used. It was a soft "missed/late" deadline, but it only labelled occurrences on
+    /// the phone and ended up blocking surveys (see `SurveyOccurrenceBuilder.status`); the
+    /// availability window is now the only rule. Still decoded and encoded so existing configs
+    /// that set it round-trip unchanged. The dashboard no longer offers it.
     let promptExpirationMinutes: Int?
 
     private enum CodingKeys: String, CodingKey {

@@ -33,30 +33,17 @@ struct SurveyOccurrenceBuilder: Sendable {
             let surveyLower = max(lower, date(survey.activeStartDate, calendar: calendar) ?? lower)
             let surveyUpper = min(upper, endOfDay(survey.activeEndDate, calendar: calendar) ?? upper)
             guard surveyLower <= surveyUpper else { continue }
-            let promptLead = Self.promptLeadMinutes(for: survey, configuration: configuration)
             for scheduled in occurrences(schedule: survey.schedule, lower: surveyLower, upper: surveyUpper, calendar: calendar, participant: participant, studyID: configuration.identity.id, seedKey: survey.id) {
                 let id = try SurveyOccurrenceIdentifierFactory.identifier(studyID: configuration.identity.id, surveyID: survey.id,
                                                                            occurrence: scheduled, calendar: calendar)
                 guard seen.insert(id).inserted else { throw StudyConfigurationError.duplicateID(id) }
                 let opens = calendar.date(byAdding: .minute, value: -survey.availabilityWindow.opensMinutesBefore, to: scheduled) ?? scheduled
                 let closes = calendar.date(byAdding: .minute, value: survey.availabilityWindow.closesMinutesAfter, to: scheduled) ?? scheduled
-                // A softer, adherence-tracking-only deadline — never later than `closes`, which
-                // alone still governs whether the occurrence can actually be opened/completed.
-                // See `status(...)`: only applies while the occurrence has never been opened.
-                // Counted from when the participant is first PROMPTED, not from `opens`. With a
-                // survey opening hours before its notification (e.g. the default 180 minutes), a
-                // deadline counted from `opens` passed before the notification even arrived.
-                let promptedAt = promptLead
-                    .flatMap { calendar.date(byAdding: .minute, value: -$0, to: scheduled) }
-                    .map { max($0, opens) } ?? opens
-                let missedDeadline = survey.promptExpirationMinutes
-                    .flatMap { calendar.date(byAdding: .minute, value: $0, to: promptedAt) }
-                    .map { min($0, closes) } ?? closes
                 let persisted = participant.surveyOccurrenceStates[id]
                 if let persisted, persisted.surveyID != survey.id || abs(persisted.scheduledFor.timeIntervalSince(scheduled)) >= 1 {
                     throw SurveyRuntimeError.inconsistentPersistedState
                 }
-                let status = status(now: now, opens: opens, closes: closes, missedDeadline: missedDeadline,
+                let status = status(now: now, opens: opens, closes: closes,
                                     persisted: persisted, eligible: participant.participationStatus == .enrolled)
                 result.append(.init(id: id, studyID: configuration.identity.id, surveyID: survey.id,
                                     name: survey.name, summary: survey.description, instructions: survey.instructions,
@@ -81,32 +68,17 @@ struct SurveyOccurrenceBuilder: Sendable {
         return occurrences(schedule: schedule, lower: lower, upper: upper, calendar: calendar, participant: participant, studyID: studyID, seedKey: seedKey)
     }
 
-    /// `missedDeadline`: a softer adherence-tracking cutoff (see `promptExpirationMinutes`),
-    /// always `<= closes` — only ever consulted while the occurrence has never been opened, via
-    /// either entry path (tapping the notification or navigating to it directly from the Surveys
-    /// tab — both stamp `openedAt` identically, see `AppState.persistSurveyOpened`), so opening it
-    /// either way before this deadline correctly keeps it from ever reading as "missed" for that
-    /// reason. `closes` (the hard availability-window cutoff) still wins regardless of
-    /// `openedAt` once reached, unchanged from before this field existed.
-    private func status(now: Date, opens: Date, closes: Date, missedDeadline: Date, persisted: PersistedSurveyOccurrenceState?, eligible: Bool) -> SurveyOccurrenceStatus {
+    /// The availability window (`opens`...`closes`) is the only rule: a survey can be opened and
+    /// completed inside it and not outside it. `promptExpirationMinutes` is deliberately ignored.
+    /// It only ever labelled occurrences on the phone (it never reaches the study's data), and
+    /// counted from `opens` it blocked surveys hours before their notification arrived. Lateness
+    /// can be computed from the uploaded `scheduled_for` and `opened_at` instead.
+    private func status(now: Date, opens: Date, closes: Date, persisted: PersistedSurveyOccurrenceState?, eligible: Bool) -> SurveyOccurrenceStatus {
         if persisted?.completedAt != nil { return .completed }
         guard eligible else { return .unavailable }
         if now < opens { return .upcoming }
         if now > closes { return .missed }
-        guard persisted?.openedAt == nil else { return .opened }
-        return now > missedDeadline ? .late : .available
-    }
-
-    /// How many minutes before an occurrence's scheduled time the participant is first notified
-    /// about it: the largest `notifyMinutesBefore` among enabled survey reminders targeting this
-    /// survey, 0 for its own `sendNotificationOnOpen` notification (which fires at the scheduled
-    /// time), or `nil` when nothing notifies, in which case the participant is "prompted" when the
-    /// survey opens in the Surveys tab. Mirrors which notifications NotificationScheduleBuilder
-    /// actually schedules for a survey.
-    static func promptLeadMinutes(for survey: SurveyConfiguration, configuration: StudyConfiguration) -> Int? {
-        let linked = configuration.reminders.filter { $0.enabled && $0.kind == .survey && $0.surveyID == survey.id }
-        if !linked.isEmpty { return linked.map { $0.notifyMinutesBefore ?? 0 }.max() }
-        return survey.sendNotificationOnOpen ? 0 : nil
+        return persisted?.openedAt == nil ? .available : .opened
     }
 
     // studyID/seedKey: only consulted for `.randomWindow` schedules, to seed

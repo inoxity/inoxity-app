@@ -752,7 +752,7 @@ final class AppState: ObservableObject {
         refreshSurveyRuntime()
         guard participantState?.participationStatus != .withdrawn,
               let configuration, let occurrence = surveySummary.occurrences.first(where: { $0.id == occurrenceID }),
-              occurrence.status == .available || occurrence.status == .opened,
+              occurrence.status.isOpenable,
               let survey = configuration.surveys.first(where: { $0.id == occurrence.surveyID && $0.enabled }) else {
             surveyErrorMessage = SurveyRuntimeError.unavailableOccurrence.localizedDescription; return
         }
@@ -1072,7 +1072,7 @@ final class AppState: ObservableObject {
         let candidates = surveySummary.occurrences.filter { $0.surveyID == route.surveyID }
         if let id = route.occurrenceID {
             guard let occurrence = candidates.first(where: { $0.id == id }),
-                  occurrence.status == .available || occurrence.status == .opened else {
+                  occurrence.status.isOpenable else {
                 focusedSurveyOccurrenceID = nil; pendingSurveyRoute = nil
                 surveyErrorMessage = "The requested survey is no longer available."
                 return
@@ -1083,7 +1083,7 @@ final class AppState: ObservableObject {
             // Surveys list and waiting for a second manual tap.
             Task { await openSurveyOccurrence(id) }
         } else {
-            let available = candidates.filter { $0.status == .available || $0.status == .opened }
+            let available = candidates.filter { $0.status.isOpenable }
             focusedSurveyOccurrenceID = available.count == 1 ? available[0].id : nil
         }
     }

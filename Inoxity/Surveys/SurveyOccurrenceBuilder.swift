@@ -33,6 +33,7 @@ struct SurveyOccurrenceBuilder: Sendable {
             let surveyLower = max(lower, date(survey.activeStartDate, calendar: calendar) ?? lower)
             let surveyUpper = min(upper, endOfDay(survey.activeEndDate, calendar: calendar) ?? upper)
             guard surveyLower <= surveyUpper else { continue }
+            let promptLead = Self.promptLeadMinutes(for: survey, configuration: configuration)
             for scheduled in occurrences(schedule: survey.schedule, lower: surveyLower, upper: surveyUpper, calendar: calendar, participant: participant, studyID: configuration.identity.id, seedKey: survey.id) {
                 let id = try SurveyOccurrenceIdentifierFactory.identifier(studyID: configuration.identity.id, surveyID: survey.id,
                                                                            occurrence: scheduled, calendar: calendar)
@@ -42,8 +43,14 @@ struct SurveyOccurrenceBuilder: Sendable {
                 // A softer, adherence-tracking-only deadline — never later than `closes`, which
                 // alone still governs whether the occurrence can actually be opened/completed.
                 // See `status(...)`: only applies while the occurrence has never been opened.
+                // Counted from when the participant is first PROMPTED, not from `opens`. With a
+                // survey opening hours before its notification (e.g. the default 180 minutes), a
+                // deadline counted from `opens` passed before the notification even arrived.
+                let promptedAt = promptLead
+                    .flatMap { calendar.date(byAdding: .minute, value: -$0, to: scheduled) }
+                    .map { max($0, opens) } ?? opens
                 let missedDeadline = survey.promptExpirationMinutes
-                    .flatMap { calendar.date(byAdding: .minute, value: $0, to: opens) }
+                    .flatMap { calendar.date(byAdding: .minute, value: $0, to: promptedAt) }
                     .map { min($0, closes) } ?? closes
                 let persisted = participant.surveyOccurrenceStates[id]
                 if let persisted, persisted.surveyID != survey.id || abs(persisted.scheduledFor.timeIntervalSince(scheduled)) >= 1 {
@@ -87,7 +94,19 @@ struct SurveyOccurrenceBuilder: Sendable {
         if now < opens { return .upcoming }
         if now > closes { return .missed }
         guard persisted?.openedAt == nil else { return .opened }
-        return now > missedDeadline ? .missed : .available
+        return now > missedDeadline ? .late : .available
+    }
+
+    /// How many minutes before an occurrence's scheduled time the participant is first notified
+    /// about it: the largest `notifyMinutesBefore` among enabled survey reminders targeting this
+    /// survey, 0 for its own `sendNotificationOnOpen` notification (which fires at the scheduled
+    /// time), or `nil` when nothing notifies, in which case the participant is "prompted" when the
+    /// survey opens in the Surveys tab. Mirrors which notifications NotificationScheduleBuilder
+    /// actually schedules for a survey.
+    static func promptLeadMinutes(for survey: SurveyConfiguration, configuration: StudyConfiguration) -> Int? {
+        let linked = configuration.reminders.filter { $0.enabled && $0.kind == .survey && $0.surveyID == survey.id }
+        if !linked.isEmpty { return linked.map { $0.notifyMinutesBefore ?? 0 }.max() }
+        return survey.sendNotificationOnOpen ? 0 : nil
     }
 
     // studyID/seedKey: only consulted for `.randomWindow` schedules, to seed

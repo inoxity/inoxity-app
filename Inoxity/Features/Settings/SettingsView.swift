@@ -131,7 +131,7 @@ struct SettingsView: View {
                     settingsRow("Last completion", state.surveySummary.lastCompletionDate?.formatted(date: .abbreviated, time: .shortened) ?? "None")
                     if let message = state.surveyErrorMessage { Text(message).font(.footnote).foregroundStyle(InoxityTheme.secondaryText) }
                     SecondaryButton(title: "Refresh Survey Availability") { state.refreshSurveyRuntime() }
-                    let available = state.surveySummary.occurrences.filter { $0.status == .available || $0.status == .opened }
+                    let available = state.surveySummary.occurrences.filter { $0.status.isOpenable }
                     if available.count == 1 {
                         SecondaryButton(title: "Open Current Survey") { Task { await state.openSurveyOccurrence(available[0].id) } }
                     }

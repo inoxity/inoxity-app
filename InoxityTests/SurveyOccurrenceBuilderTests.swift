@@ -46,20 +46,39 @@ final class SurveyOccurrenceBuilderTests: XCTestCase {
     // MARK: - promptExpirationMinutes (soft "missed" deadline, distinct from the hard
     // availabilityWindow.closesMinutesAfter cutoff — see SurveyOccurrenceBuilder.status)
 
-    func testMissedViaPromptExpirationWhenNeverOpened() throws {
+    func testPromptExpirationCountsFromTheNotificationNotTheEarlierOpen() throws {
+        // The fixture's survey opens 180 minutes before `scheduled`, and its linked reminder
+        // notifies at `scheduled` itself (notifyMinutesBefore 0). A deadline counted from the open
+        // passed long before the notification arrived, so every tap said "not available".
         let study = try surveyWithPromptExpiration(30), zone = TimeZone(identifier: "America/Los_Angeles")!
         let scheduled = date(2026, 7, 24, 9, 0, zone)
         let participant = ParticipantState(studyID: study.identity.id, enrollmentDate: date(2026, 7, 1, 0, 0, zone))
-        // Survey opens 180 minutes before `scheduled` (per the fixture's availabilityWindow) — the
-        // 30-minute expiration counts from that opening moment, not from `scheduled` itself.
+        // Filtered on the exact scheduledFor: the schedule is daily, so there's one occurrence per day.
+        func status(at now: Date) throws -> SurveyOccurrenceStatus? {
+            try builder.build(configuration: study, participant: participant, now: now, timeZone: zone).first { $0.scheduledFor == scheduled }?.status
+        }
+        XCTAssertEqual(try status(at: scheduled.addingTimeInterval(29 * 60)), .available)
+        // Past the soft deadline: late, and still openable until the survey closes.
+        XCTAssertEqual(try status(at: scheduled.addingTimeInterval(31 * 60)), .late)
+        XCTAssertTrue(try XCTUnwrap(try status(at: scheduled.addingTimeInterval(31 * 60))).isOpenable)
+        XCTAssertEqual(try status(at: scheduled.addingTimeInterval(181 * 60)), .missed)
+    }
+
+    func testPromptExpirationWithOnlyTheSurveysOwnNotificationCountsFromScheduledTime() throws {
+        let study = try surveyWithPromptExpiration(14, reminders: [], sendNotificationOnOpen: true)
+        let zone = TimeZone(identifier: "America/Los_Angeles")!, scheduled = date(2026, 7, 24, 9, 0, zone)
+        let participant = ParticipantState(studyID: study.identity.id, enrollmentDate: date(2026, 7, 1, 0, 0, zone))
+        let value = try builder.build(configuration: study, participant: participant, now: scheduled.addingTimeInterval(60), timeZone: zone).first { $0.scheduledFor == scheduled }
+        XCTAssertEqual(value?.status, .available, "the notification fires at the scheduled time, so the survey must be available then")
+    }
+
+    func testPromptExpirationWithoutAnyNotificationCountsFromTheOpen() throws {
+        let study = try surveyWithPromptExpiration(30, reminders: [], sendNotificationOnOpen: false)
+        let zone = TimeZone(identifier: "America/Los_Angeles")!, scheduled = date(2026, 7, 24, 9, 0, zone)
+        let participant = ParticipantState(studyID: study.identity.id, enrollmentDate: date(2026, 7, 1, 0, 0, zone))
         let opens = scheduled.addingTimeInterval(-180 * 60)
-        // Filtered on the exact scheduledFor, not just surveyID — the fixture's schedule is
-        // "daily", so build() returns one occurrence per day in the window and `.first` alone
-        // could pick a different day's occurrence than the one under test.
-        let justBeforeDeadline = try builder.build(configuration: study, participant: participant, now: opens.addingTimeInterval(29 * 60), timeZone: zone).first { $0.scheduledFor == scheduled }
-        XCTAssertEqual(justBeforeDeadline?.status, .available)
-        let justAfterDeadline = try builder.build(configuration: study, participant: participant, now: opens.addingTimeInterval(31 * 60), timeZone: zone).first { $0.scheduledFor == scheduled }
-        XCTAssertEqual(justAfterDeadline?.status, .missed)
+        let value = try builder.build(configuration: study, participant: participant, now: opens.addingTimeInterval(31 * 60), timeZone: zone).first { $0.scheduledFor == scheduled }
+        XCTAssertEqual(value?.status, .late)
     }
 
     func testOpenedBeforeDeadlineNeverReadsAsMissed() throws {
@@ -101,12 +120,17 @@ final class SurveyOccurrenceBuilderTests: XCTestCase {
         XCTAssertFalse(occurrences.isEmpty)
         XCTAssertTrue(occurrences.allSatisfy { $0.scheduledFor < self.date(2026,7,27,0,0,zone) })
     }
-    private func surveyWithPromptExpiration(_ minutes: Int) throws -> StudyConfiguration {
+    /// `reminders`/`sendNotificationOnOpen` override the fixture's (one linked survey reminder at
+    /// notifyMinutesBefore 0, no auto-notification) when given.
+    private func surveyWithPromptExpiration(_ minutes: Int, reminders: [[String: Any]]? = nil,
+                                            sendNotificationOnOpen: Bool? = nil) throws -> StudyConfiguration {
         let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "SleepStudy", withExtension: "json"))
         var root = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
         var surveys = try XCTUnwrap(root["surveys"] as? [[String: Any]])
         surveys[0]["promptExpirationMinutes"] = minutes
+        if let sendNotificationOnOpen { surveys[0]["sendNotificationOnOpen"] = sendNotificationOnOpen }
         root["surveys"] = surveys
+        if let reminders { root["reminders"] = reminders }
         return try JSONDecoder().decode(StudyConfiguration.self, from: JSONSerialization.data(withJSONObject: root))
     }
 

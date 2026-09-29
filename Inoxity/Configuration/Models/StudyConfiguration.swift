@@ -218,10 +218,13 @@ struct SurveyConfiguration: Codable, Equatable, Identifiable, Sendable {
     /// `name` (see `NotificationScheduleBuilder`). Ignored when `sendNotificationOnOpen` is false.
     let notificationTitle: String?
     let notificationBody: String?
-    /// If set, an occurrence is marked `.missed` (see `SurveyOccurrenceBuilder.status`) once this
-    /// many minutes pass past `opensAt` without the participant opening it — a softer,
-    /// adherence-tracking deadline that can be shorter than `availabilityWindow.closesMinutesAfter`,
-    /// which alone still governs whether the occurrence can actually still be opened/completed.
+    /// If set, an occurrence is marked `.late` (see `SurveyOccurrenceBuilder.status`) once this
+    /// many minutes pass after the participant is first prompted without them opening it — a
+    /// softer, adherence-tracking deadline that can be shorter than
+    /// `availabilityWindow.closesMinutesAfter`, which alone still governs whether the occurrence
+    /// can actually still be opened/completed (a late occurrence still can). "Prompted" is the
+    /// first notification for the occurrence, or `opensAt` when nothing notifies — see
+    /// `SurveyOccurrenceBuilder.promptLeadMinutes`.
     /// `nil` means only `closesMinutesAfter` governs "missed" (today's only-ever-possible
     /// behavior before this field existed). Lived on `ReminderConfiguration` before schemaVersion
     /// 8 — moved here since it's fundamentally about a survey occurrence's own deadline, not any

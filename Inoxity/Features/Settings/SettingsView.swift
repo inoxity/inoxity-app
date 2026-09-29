@@ -34,7 +34,7 @@ struct SettingsView: View {
                 mediaSection
                 diagnosticsSection
                 SecondaryButton(title: "Reset Enrollment") { state.beginWithdrawal() }
-                Text("Starts the withdrawal flow so you can choose whether to keep or delete this study’s local data.")
+                Text("Starts the withdrawal flow so you can choose whether to keep or delete the data you’ve sent to this study.")
                     .font(.footnote).foregroundStyle(InoxityTheme.secondaryText)
             }
             .foregroundStyle(InoxityTheme.primaryText)

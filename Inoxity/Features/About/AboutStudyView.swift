@@ -37,7 +37,7 @@ struct AboutStudyView: View {
         Text("FREQUENTLY ASKED QUESTIONS").font(.caption.weight(.semibold)).tracking(2).foregroundStyle(InoxityTheme.pink)
         ForEach(configuration.faqs) { faq in InoxityCard { VStack(alignment: .leading, spacing: 8) { Text(faq.question).font(.headline); Text(faq.answer).font(.subheadline).foregroundStyle(InoxityTheme.secondaryText) } } }
         SecondaryButton(title: "Withdraw from Study") { state.beginWithdrawal() }
-        Text("You can choose whether to keep or delete this study’s local app data before withdrawing. This does not claim that previously uploaded study data or Apple Health data is deleted.")
+        Text("When you withdraw, you can choose to keep the data you’ve already sent to the research team, or delete it from the team’s database and this phone.")
             .font(.footnote).foregroundStyle(InoxityTheme.secondaryText)
     }.foregroundStyle(InoxityTheme.primaryText) }
     .sheet(isPresented: $contactSheetPresented) {

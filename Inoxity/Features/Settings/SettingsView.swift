@@ -41,7 +41,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $editingSleepSchedule) {
             if let sleepSchedule = configuration.sleepSchedule {
-                SleepScheduleView(configuration: sleepSchedule, progress: .init(current: 0, total: 1)) { wakeMinutes, bedMinutes in
+                SleepScheduleView(configuration: sleepSchedule, progress: .init(current: 0, total: 1),
+                                  savedWakeMinutes: state.participantState?.wakeTimeMinutes,
+                                  savedBedMinutes: state.participantState?.bedTimeMinutes) { wakeMinutes, bedMinutes in
                     state.saveSleepSchedule(wakeMinutes: wakeMinutes, bedMinutes: bedMinutes)
                     editingSleepSchedule = false
                 }
@@ -131,9 +133,9 @@ struct SettingsView: View {
                     settingsRow("Last completion", state.surveySummary.lastCompletionDate?.formatted(date: .abbreviated, time: .shortened) ?? "None")
                     if let message = state.surveyErrorMessage { Text(message).font(.footnote).foregroundStyle(InoxityTheme.secondaryText) }
                     SecondaryButton(title: "Refresh Survey Availability") { state.refreshSurveyRuntime() }
-                    let available = state.surveySummary.occurrences.filter { $0.status.isOpenable }
+                    let available = state.surveySummary.occurrences.filter { $0.status.canStart }
                     if available.count == 1 {
-                        SecondaryButton(title: "Open Current Survey") { Task { await state.openSurveyOccurrence(available[0].id) } }
+                        SecondaryButton(title: "Open Current Survey") { state.requestSurveyStart(available[0].id) }
                     }
                 }
             }

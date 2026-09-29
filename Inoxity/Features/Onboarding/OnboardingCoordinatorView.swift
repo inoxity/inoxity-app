@@ -22,7 +22,9 @@ struct OnboardingCoordinatorView: View {
                 return success
             } }
             else if hasSleepSchedule, step == sleepScheduleStep, let sleepSchedule = configuration.sleepSchedule {
-                SleepScheduleView(configuration: sleepSchedule, progress: progress(step)) { wakeMinutes, bedMinutes in
+                SleepScheduleView(configuration: sleepSchedule, progress: progress(step),
+                                  savedWakeMinutes: state.participantState?.wakeTimeMinutes,
+                                  savedBedMinutes: state.participantState?.bedTimeMinutes) { wakeMinutes, bedMinutes in
                     state.saveSleepSchedule(wakeMinutes: wakeMinutes, bedMinutes: bedMinutes)
                     advance(step)
                 }
@@ -103,8 +105,22 @@ struct SleepScheduleView: View {
     let configuration: SleepScheduleConfiguration
     let progress: OnboardingProgress
     let continueAction: (_ wakeMinutes: Int, _ bedMinutes: Int) -> Void
-    @State private var wakeTime = Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date()) ?? Date()
-    @State private var bedTime = Calendar.current.date(bySettingHour: 23, minute: 0, second: 0, of: Date()) ?? Date()
+    @State private var wakeTime: Date
+    @State private var bedTime: Date
+
+    /// `savedWakeMinutes`/`savedBedMinutes`: the participant's current schedule, so editing it later
+    /// (from Settings) starts from what they saved instead of resetting both pickers to 7:00/23:00.
+    init(configuration: SleepScheduleConfiguration, progress: OnboardingProgress,
+         savedWakeMinutes: Int? = nil, savedBedMinutes: Int? = nil,
+         continueAction: @escaping (_ wakeMinutes: Int, _ bedMinutes: Int) -> Void) {
+        self.configuration = configuration; self.progress = progress; self.continueAction = continueAction
+        _wakeTime = State(initialValue: Self.time(minutes: savedWakeMinutes ?? 7 * 60))
+        _bedTime = State(initialValue: Self.time(minutes: savedBedMinutes ?? 23 * 60))
+    }
+
+    private static func time(minutes: Int) -> Date {
+        Calendar.current.date(bySettingHour: minutes / 60, minute: minutes % 60, second: 0, of: Date()) ?? Date()
+    }
 
     var body: some View { OnboardingScreen(progress: progress) {
         Text("YOUR SCHEDULE").font(.caption.weight(.semibold)).tracking(2).foregroundStyle(InoxityTheme.aqua)

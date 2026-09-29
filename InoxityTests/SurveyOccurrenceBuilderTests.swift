@@ -75,6 +75,28 @@ final class SurveyOccurrenceBuilderTests: XCTestCase {
         XCTAssertEqual(closed?.status, .missed)
     }
 
+    func testStartedSurveyWithoutCompletionTrackingIsDoneNotMissedOnceItCloses() throws {
+        let zone = TimeZone(identifier: "America/Los_Angeles")!, scheduled = date(2026, 7, 24, 9, 0, zone)
+        let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "SleepStudy", withExtension: "json"))
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+        var surveys = try XCTUnwrap(root["surveys"] as? [[String: Any]])
+        surveys[0]["completionCallback"] = ["enabled": false]; root["surveys"] = surveys
+        let untracked = try JSONDecoder().decode(StudyConfiguration.self, from: JSONSerialization.data(withJSONObject: root))
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = zone
+        let id = try SurveyOccurrenceIdentifierFactory.identifier(studyID: untracked.identity.id, surveyID: "morning-checkin", occurrence: scheduled, calendar: calendar)
+        let notStarted = ParticipantState(studyID: untracked.identity.id, enrollmentDate: date(2026, 7, 1, 0, 0, zone))
+        var started = notStarted
+        started.surveyOccurrenceStates[id] = .init(occurrenceID: id, surveyID: "morning-checkin", scheduledFor: scheduled, openedAt: scheduled, completedAt: nil)
+        let afterClose = scheduled.addingTimeInterval(181 * 60)
+        func status(_ config: StudyConfiguration, _ participant: ParticipantState) throws -> SurveyOccurrenceStatus? {
+            try builder.build(configuration: config, participant: participant, now: afterClose, timeZone: zone).first { $0.scheduledFor == scheduled }?.status
+        }
+        XCTAssertEqual(try status(untracked, started), .done)
+        XCTAssertEqual(try status(untracked, notStarted), .missed)
+        // With tracking on, a started survey that never reported completion still reads as missed.
+        XCTAssertEqual(try status(try fixture("SleepStudy"), started), .missed)
+    }
+
     func testNoOccurrencesAfterTheParticipantsLastDay() throws {
         let zone = TimeZone(identifier: "America/Los_Angeles")!
         let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "SleepStudy", withExtension: "json"))

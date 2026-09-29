@@ -118,6 +118,12 @@ private struct NotificationTestProvider: StudyConfigurationProviding {
         XCTAssertEqual(state.selectedTab, .surveys)
         XCTAssertEqual(state.focusedSurveyOccurrenceID, occurrence.id)
         XCTAssertNil(state.surveyErrorMessage)
+        // The tap asks "take your survey now?" first, like the Surveys tab, instead of starting it.
+        XCTAssertEqual(state.pendingSurveyStartID, occurrence.id)
+        XCTAssertNil(state.activeSurveyPresentation)
+        await state.confirmSurveyStart(occurrence.id)
+        XCTAssertEqual(state.activeSurveyPresentation?.occurrenceID, occurrence.id)
+        XCTAssertNil(state.pendingSurveyStartID)
     }
 
     @MainActor private final class Context {

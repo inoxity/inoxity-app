@@ -43,8 +43,9 @@ struct SurveyOccurrenceBuilder: Sendable {
                 if let persisted, persisted.surveyID != survey.id || abs(persisted.scheduledFor.timeIntervalSince(scheduled)) >= 1 {
                     throw SurveyRuntimeError.inconsistentPersistedState
                 }
-                let status = status(now: now, opens: opens, closes: closes,
-                                    persisted: persisted, eligible: participant.participationStatus == .enrolled)
+                let status = status(now: now, opens: opens, closes: closes, persisted: persisted,
+                                    eligible: participant.participationStatus == .enrolled,
+                                    tracksCompletion: survey.completionCallback.enabled)
                 result.append(.init(id: id, studyID: configuration.identity.id, surveyID: survey.id,
                                     name: survey.name, summary: survey.description, instructions: survey.instructions,
                                     privacyText: survey.privacyText, presentationMode: survey.presentationMode,
@@ -73,11 +74,15 @@ struct SurveyOccurrenceBuilder: Sendable {
     /// It only ever labelled occurrences on the phone (it never reaches the study's data), and
     /// counted from `opens` it blocked surveys hours before their notification arrived. Lateness
     /// can be computed from the uploaded `scheduled_for` and `opened_at` instead.
-    private func status(now: Date, opens: Date, closes: Date, persisted: PersistedSurveyOccurrenceState?, eligible: Bool) -> SurveyOccurrenceStatus {
+    /// `tracksCompletion` false: the survey never reports completion back, so a started survey
+    /// whose window has closed is `.done` rather than `.missed` — otherwise every started survey
+    /// would eventually read as missed.
+    private func status(now: Date, opens: Date, closes: Date, persisted: PersistedSurveyOccurrenceState?,
+                        eligible: Bool, tracksCompletion: Bool) -> SurveyOccurrenceStatus {
         if persisted?.completedAt != nil { return .completed }
         guard eligible else { return .unavailable }
         if now < opens { return .upcoming }
-        if now > closes { return .missed }
+        if now > closes { return persisted?.openedAt != nil && !tracksCompletion ? .done : .missed }
         return persisted?.openedAt == nil ? .available : .opened
     }
 

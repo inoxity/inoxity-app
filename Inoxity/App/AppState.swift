@@ -42,6 +42,9 @@ final class AppState: ObservableObject {
     @Published private(set) var surveySummary = SurveyRuntimeSummary()
     @Published private(set) var focusedSurveyOccurrenceID: String?
     @Published var activeSurveyPresentation: SurveyPresentationRequest?
+    /// The occurrence waiting on the "take your survey now?" confirmation (shown by RootView).
+    /// Each survey can be taken only once per window, so every way of starting one goes through it.
+    @Published private(set) var pendingSurveyStartID: String?
     @Published private(set) var surveyErrorMessage: String?
     @Published private(set) var mediaSummary = MediaRuntimeSummary()
     @Published private(set) var mediaErrorMessage: String?
@@ -748,13 +751,45 @@ final class AppState: ObservableObject {
         }
     }
 
+    /// Asks the participant to confirm before starting a survey (see `pendingSurveyStartID`).
+    func requestSurveyStart(_ occurrenceID: String) {
+        refreshSurveyRuntime()
+        guard let occurrence = surveySummary.occurrences.first(where: { $0.id == occurrenceID }) else {
+            // e.g. a notification for an occurrence that has since dropped out of the schedule.
+            focusedSurveyOccurrenceID = nil; surveyErrorMessage = "The requested survey is no longer available."; return
+        }
+        guard occurrence.status.canStart else {
+            focusedSurveyOccurrenceID = nil; surveyErrorMessage = Self.cannotStartMessage(occurrence.status); return
+        }
+        surveyErrorMessage = nil
+        focusedSurveyOccurrenceID = occurrenceID
+        pendingSurveyStartID = occurrenceID
+    }
+
+    func confirmSurveyStart(_ occurrenceID: String) async {
+        pendingSurveyStartID = nil
+        await openSurveyOccurrence(occurrenceID)
+    }
+
+    func cancelSurveyStart() { pendingSurveyStartID = nil }
+
+    private static func cannotStartMessage(_ status: SurveyOccurrenceStatus?) -> String {
+        switch status {
+        case .opened: "You’ve already started this survey. Each survey can only be taken once."
+        case .completed: "You’ve already completed this survey."
+        default: SurveyRuntimeError.unavailableOccurrence.localizedDescription
+        }
+    }
+
+    /// Starts the survey. Only reachable for a startable occurrence: a survey that has already
+    /// been opened can't be opened again, whichever screen asks.
     func openSurveyOccurrence(_ occurrenceID: String) async {
         refreshSurveyRuntime()
+        let occurrence = surveySummary.occurrences.first(where: { $0.id == occurrenceID })
         guard participantState?.participationStatus != .withdrawn,
-              let configuration, let occurrence = surveySummary.occurrences.first(where: { $0.id == occurrenceID }),
-              occurrence.status.isOpenable,
+              let configuration, let occurrence, occurrence.status.canStart,
               let survey = configuration.surveys.first(where: { $0.id == occurrence.surveyID && $0.enabled }) else {
-            surveyErrorMessage = SurveyRuntimeError.unavailableOccurrence.localizedDescription; return
+            surveyErrorMessage = Self.cannotStartMessage(occurrence?.status); return
         }
         do {
             let url = try SurveyURLBuilder.build(baseURL: survey.url, studyID: configuration.identity.id,
@@ -1071,19 +1106,12 @@ final class AppState: ObservableObject {
         guard let route = pendingSurveyRoute else { return }
         let candidates = surveySummary.occurrences.filter { $0.surveyID == route.surveyID }
         if let id = route.occurrenceID {
-            guard let occurrence = candidates.first(where: { $0.id == id }),
-                  occurrence.status.isOpenable else {
-                focusedSurveyOccurrenceID = nil; pendingSurveyRoute = nil
-                surveyErrorMessage = "The requested survey is no longer available."
-                return
-            }
-            focusedSurveyOccurrenceID = id; pendingSurveyRoute = nil
-            // A notification tap always carries the specific occurrence — open it
-            // directly rather than just scrolling/highlighting its card in the
-            // Surveys list and waiting for a second manual tap.
-            Task { await openSurveyOccurrence(id) }
+            pendingSurveyRoute = nil
+            // A notification tap carries the specific occurrence: ask the same "take it now?"
+            // confirmation as the Surveys tab, rather than starting it straight away.
+            requestSurveyStart(id)
         } else {
-            let available = candidates.filter { $0.status.isOpenable }
+            let available = candidates.filter { $0.status.canStart }
             focusedSurveyOccurrenceID = available.count == 1 ? available[0].id : nil
         }
     }

@@ -31,6 +31,69 @@ private struct SurveyTestProvider: StudyConfigurationProviding {
         XCTAssertEqual(state.participantState?.surveyOccurrenceStates, before)
     }
 
+    func testChangingTheSleepScheduleMovesWakeAnchoredSurveysAndTheirNotifications() async throws {
+        // SleepStudy with its survey moved to "8 hours after wake time", like a real sleep study's
+        // afternoon check-in. The linked reminder notifies at the survey's scheduled time.
+        let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "SleepStudy", withExtension: "json"))
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+        root["schemaVersion"] = 6
+        root["sleepSchedule"] = ["enabled": true, "promptTitle": "Your sleep", "wakeLabel": "Wake", "bedLabel": "Bed"]
+        var surveys = try XCTUnwrap(root["surveys"] as? [[String: Any]])
+        var schedule = try XCTUnwrap(surveys[0]["schedule"] as? [String: Any])
+        schedule["anchor"] = "wakeTime"; schedule["offsetMinutes"] = 480
+        surveys[0]["schedule"] = schedule; root["surveys"] = surveys
+        let study = try JSONDecoder().decode(StudyConfiguration.self, from: JSONSerialization.data(withJSONObject: root))
+        try StudyConfigurationValidator().validate(study)
+
+        let suite = "AppStateSurveyTests.sleep.\(UUID())", defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = UserDefaultsParticipantStateStore(defaults: defaults), notifications = MockNotificationService(nativeStatus: .authorized)
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = .current
+        let now = calendar.date(from: .init(year: 2026, month: 7, day: 24, hour: 6))!
+        try store.saveState(.init(studyID: study.identity.id, enrollmentDate: calendar.date(from: .init(year: 2026, month: 7, day: 1))!,
+                                  onboardingComplete: true, notificationPermissionState: .requestCompleted,
+                                  wakeTimeMinutes: 7 * 60, bedTimeMinutes: 23 * 60))
+        store.setActiveStudyCode(study.identity.code)
+        let state = AppState(container: .init(studyConfigurationProvider: SurveyTestProvider(configuration: study), participantStateStore: store,
+            healthKitService: MockHealthKitService(), notificationService: notifications, systemSettingsOpener: TestSettingsOpener(),
+            surveyPresenter: MockSurveyPresenter(), currentDate: { now }))
+        await state.restoreEnrollment()
+        await state.reconcileNotifications(force: true)
+        let todayAt = { (hour: Int) in calendar.date(from: .init(year: 2026, month: 7, day: 24, hour: hour))! }
+        XCTAssertTrue(state.surveySummary.occurrences.contains { $0.scheduledFor == todayAt(15) }, "wake 7:00 + 8h")
+        let before = await notifications.pendingRequests()
+        XCTAssertTrue(before.contains { $0.fireDate == todayAt(15) })
+
+        state.saveSleepSchedule(wakeMinutes: 9 * 60, bedMinutes: 23 * 60)
+        await state.refreshNotificationStatus(reconcileIfNeeded: true)
+        XCTAssertTrue(state.surveySummary.occurrences.contains { $0.scheduledFor == todayAt(17) }, "wake 9:00 + 8h")
+        XCTAssertFalse(state.surveySummary.occurrences.contains { $0.scheduledFor == todayAt(15) })
+        let after = await notifications.pendingRequests()
+        XCTAssertTrue(after.contains { $0.fireDate == todayAt(17) }, "notification should move to 17:00")
+        XCTAssertFalse(after.contains { $0.fireDate == todayAt(15) }, "the 15:00 notification should be gone")
+    }
+
+    func testASurveyCanOnlyBeStartedOnce() async throws {
+        let context = try Context(); defer { context.cleanup() }
+        let state = try await context.restoredState()
+        let occurrence = try XCTUnwrap(state.surveySummary.occurrences.first { $0.status == .available })
+        state.requestSurveyStart(occurrence.id)
+        XCTAssertEqual(state.pendingSurveyStartID, occurrence.id)
+        state.cancelSurveyStart()   // "Take later" leaves it untouched and startable
+        XCTAssertNil(state.pendingSurveyStartID); XCTAssertNil(state.participantState?.surveyOccurrenceStates[occurrence.id])
+        state.requestSurveyStart(occurrence.id)
+        await state.confirmSurveyStart(occurrence.id)
+        await state.confirmInAppSurveyPresented(occurrence.id)
+        state.activeSurveyPresentation = nil   // participant closes the survey without finishing
+        XCTAssertEqual(state.surveySummary.occurrences.first { $0.id == occurrence.id }?.status, .opened)
+        // Neither the Surveys tab nor a direct open can start it again while its window is open.
+        state.requestSurveyStart(occurrence.id)
+        XCTAssertNil(state.pendingSurveyStartID)
+        XCTAssertEqual(state.surveyErrorMessage, "You’ve already started this survey. Each survey can only be taken once.")
+        await state.openSurveyOccurrence(occurrence.id)
+        XCTAssertNil(state.activeSurveyPresentation)
+    }
+
     func testPresentationFailureDoesNotPersistOpenedAt() async throws {
         let context = try Context(name: "ActivityStudy", nowHour: 20); defer { context.cleanup() }
         context.presenter.error = SurveyRuntimeError.presentationFailed

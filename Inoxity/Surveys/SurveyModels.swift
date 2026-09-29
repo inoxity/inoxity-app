@@ -1,10 +1,16 @@
 import Foundation
 
 enum SurveyOccurrenceStatus: String, Equatable, Sendable {
-    case upcoming, available, opened, completed, missed, unavailable, outsideStudyWindow
+    /// `done`: started, window now closed, and the survey doesn't track completion
+    /// (`completionCallback.enabled` is false), so the app can't know whether it was finished and
+    /// treats starting it as doing it. Unlike `completed`, nothing confirmed the finish.
+    case upcoming, available, opened, completed, done, missed, unavailable, outsideStudyWindow
 
-    /// Whether the participant can open (or return to) the survey right now.
+    /// Whether the occurrence belongs under "Available now": startable, or started and still open.
     var isOpenable: Bool { self == .available || self == .opened }
+    /// Whether the participant can start the survey. Each occurrence can be taken only once, so an
+    /// `.opened` one can't be started again even while its window is still open.
+    var canStart: Bool { self == .available }
 }
 
 struct SurveyOccurrence: Identifiable, Equatable, Sendable {
@@ -35,7 +41,7 @@ struct PersistedSurveyOccurrenceState: Codable, Equatable, Sendable {
 struct SurveyRuntimeSummary: Equatable, Sendable {
     var occurrences: [SurveyOccurrence] = []
     var availableCount: Int { occurrences.filter { $0.status.isOpenable }.count }
-    var completedCount: Int { occurrences.filter { $0.status == .completed }.count }
+    var completedCount: Int { occurrences.filter { $0.status == .completed || $0.status == .done }.count }
     var missedCount: Int { occurrences.filter { $0.status == .missed }.count }
     var lastCompletionDate: Date? { occurrences.compactMap(\.completedAt).max() }
 }

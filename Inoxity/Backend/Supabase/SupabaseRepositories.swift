@@ -43,11 +43,12 @@ enum SupabaseClientFactory {
 private actor SupabaseAuthenticationCore {
     static let authTimeoutSeconds: Double = 12
     let client: SupabaseClient
+    let signInStage: EnrollmentStage
     private var inFlight: Task<AuthenticatedParticipant, Error>?
-    init(client: SupabaseClient) { self.client = client }
+    init(client: SupabaseClient, signInStage: EnrollmentStage) { self.client = client; self.signInStage = signInStage }
     func participant() async throws -> AuthenticatedParticipant {
         if let inFlight { return try await inFlight.value }
-        let task = Task { [client] in
+        let task = Task { [client, signInStage] in
             do {
                 let session = try await Self.withTimeout(seconds: Self.authTimeoutSeconds) { try await client.auth.session }
                 return AuthenticatedParticipant(authUserID: session.user.id, isAnonymous: session.user.isAnonymous,
@@ -57,7 +58,12 @@ private actor SupabaseAuthenticationCore {
                     let session = try await Self.withTimeout(seconds: Self.authTimeoutSeconds) { try await client.auth.signInAnonymously() }
                     return AuthenticatedParticipant(authUserID: session.user.id, isAnonymous: true,
                                                     createdAt: session.user.createdAt)
-                } catch { throw BackendError.unavailable }
+                } catch {
+                    // Kept for enrollment error reports: e.g. "Anonymous sign-ins are disabled"
+                    // or a paused project would otherwise both read as a bare `.unavailable`.
+                    EnrollmentDiagnostics.record(error, stage: signInStage)
+                    throw BackendError.unavailable
+                }
             }
         }
         inFlight = task
@@ -73,7 +79,7 @@ private actor SupabaseAuthenticationCore {
             group.addTask { try await operation() }
             group.addTask {
                 try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-                throw BackendError.unavailable
+                throw SignInTimeout(seconds: seconds)
             }
             let result = try await group.next()!
             group.cancelAll()
@@ -82,9 +88,17 @@ private actor SupabaseAuthenticationCore {
     }
 }
 
+/// Only ever surfaces inside SupabaseAuthenticationCore, which records it and rethrows `.unavailable`.
+private struct SignInTimeout: Error, CustomStringConvertible {
+    let seconds: Double
+    var description: String { "No response within \(Int(seconds)) seconds" }
+}
+
 actor SupabaseControlBackendAuthenticator: ControlBackendAuthenticating {
     private let core: SupabaseAuthenticationCore
-    init(environment: BackendEnvironment) { core = SupabaseAuthenticationCore(client: SupabaseClientFactory.make(control: environment)) }
+    init(environment: BackendEnvironment) {
+        core = SupabaseAuthenticationCore(client: SupabaseClientFactory.make(control: environment), signInStage: .inoxitySignIn)
+    }
     func authenticatedParticipant() async throws -> AuthenticatedParticipant { try await core.participant() }
 }
 
@@ -94,7 +108,7 @@ actor SupabaseStudyBackendAuthenticator: StudyBackendAuthenticating {
     private let core: SupabaseAuthenticationCore
     init(descriptor: StudyBackendDescriptor, client: SupabaseClient) {
         backendID = descriptor.backendID; storageNamespace = descriptor.authStorageNamespace
-        core = SupabaseAuthenticationCore(client: client)
+        core = SupabaseAuthenticationCore(client: client, signInStage: .studyDatabaseSignIn)
     }
     func authenticatedParticipant() async throws -> AuthenticatedParticipant { try await core.participant() }
 }
@@ -149,7 +163,18 @@ actor SupabaseControlStudyRepository: ControlBackendClientProviding {
                          configurationRevision: row.configurationRevision, descriptor: descriptor, fetchedAt: now())
         } catch let error as RemoteStudyError { throw error }
         catch let error as BackendError { throw error }
-        catch { throw Self.map(error) }
+        catch let error as StudyConfigurationError {
+            // The study's settings failed validation on this device, which isn't a connection
+            // problem and mustn't read as "unavailable". A study the researcher paused, closed,
+            // or hasn't started passes through untouched so its own message reaches participants.
+            EnrollmentDiagnostics.record(error, stage: .studyLookup)
+            switch error {
+            case .unavailable, .notStarted, .ended, .unknownCode: throw error
+            case .unsupportedSchema: throw RemoteStudyError.unsupportedConfiguration
+            default: throw RemoteStudyError.invalidConfiguration
+            }
+        }
+        catch { EnrollmentDiagnostics.record(error, stage: .studyLookup); throw Self.map(error) }
     }
     private static func map(_ error: Error) -> RemoteStudyError {
         let text = String(describing: error).lowercased()
@@ -227,7 +252,10 @@ private actor BoundSupabaseStudyRepository: StudyBackendClientProviding, StudyBa
         _ = try await auth.authenticatedParticipant()
         do {
             let rows: [IdentityRow] = try await client.rpc("get_study_backend_identity").execute().value
-            guard let row = rows.first else { throw BackendError.invalidResponse }
+            guard let row = rows.first else {
+                EnrollmentDiagnostics.record(detail: EnrollmentErrorReport.identityRowMissing, stage: .studyDatabaseCheck)
+                throw BackendError.invalidResponse
+            }
             let code = StudyCodeNormalizer.normalize(expectedCode)
             guard row.isActive else { throw BackendError.inactiveBackend }
             guard row.backendInstanceID == descriptor.backendID, row.stableStudyID == expectedStudyID,
@@ -239,7 +267,7 @@ private actor BoundSupabaseStudyRepository: StudyBackendClientProviding, StudyBa
                 isActive: row.isActive, validatedAt: now())
             verified = result; return result
         } catch let error as BackendError { throw error }
-        catch { throw SupabaseBackendErrorMapper.mapStudyBackend(error) }
+        catch { EnrollmentDiagnostics.record(error, stage: .studyDatabaseCheck); throw SupabaseBackendErrorMapper.mapStudyBackend(error) }
     }
     private func requireVerified() throws -> ValidatedStudyBackendIdentity {
         guard let verified, verified.backendInstanceID == descriptor.backendID else { throw BackendError.routingRequired }
@@ -251,7 +279,8 @@ private actor BoundSupabaseStudyRepository: StudyBackendClientProviding, StudyBa
             let rows: [ParticipantRow] = try await client.rpc("ensure_participant").execute().value
             guard let row = rows.first else { throw BackendError.invalidResponse }
             return .init(id: row.participantID, createdAt: row.createdAt)
-        } catch let error as BackendError { throw error } catch { throw SupabaseBackendErrorMapper.mapStudyBackend(error) }
+        } catch let error as BackendError { throw error }
+        catch { EnrollmentDiagnostics.record(error, stage: .registration); throw SupabaseBackendErrorMapper.mapStudyBackend(error) }
     }
     func register(_ value: EnrollmentRegistration) async throws -> RemoteEnrollment {
         let identity = try requireVerified(); guard identity.stableStudyID == value.stableStudyID else { throw BackendError.backendIdentityMismatch }
@@ -268,7 +297,8 @@ private actor BoundSupabaseStudyRepository: StudyBackendClientProviding, StudyBa
                          remoteStudyID: descriptor.backendID, status: row.status, enrolledAt: row.enrolledAt,
                          configurationSchemaVersion: row.configurationSchemaVersion,
                          configurationRevision: row.configurationRevision)
-        } catch let error as BackendError { throw error } catch { throw SupabaseBackendErrorMapper.mapStudyBackend(error) }
+        } catch let error as BackendError { throw error }
+        catch { EnrollmentDiagnostics.record(error, stage: .registration); throw SupabaseBackendErrorMapper.mapStudyBackend(error) }
     }
     func updateSleepSchedule(wakeMinutes: Int, bedMinutes: Int) async throws {
         let identity = try requireVerified()

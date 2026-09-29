@@ -83,6 +83,8 @@ struct ParticipantIDView: View {
         if showError && !valid, case .invalid(let message) = validation { ErrorMessageView(message: message) }
         if isRegistering, let message = state.backendActionMessage {
             Text(message).font(.footnote).foregroundStyle(InoxityTheme.secondaryText)
+        } else if lastAttemptFailed, let report = state.enrollmentErrorReport {
+            EnrollmentErrorView(report: report, copyText: state.enrollmentErrorCopyText(report))
         } else if lastAttemptFailed, let message = state.backendActionMessage {
             ErrorMessageView(message: message)
         }

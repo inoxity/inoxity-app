@@ -25,7 +25,9 @@ struct StudyCodeView: View {
                 Text("Use the code provided by your study team to configure your Inoxity experience.").foregroundStyle(InoxityTheme.secondaryText).lineSpacing(5)
                 StyledTextField(label: "Study code", placeholder: "e.g. STUDY123", text: $model.code)
                     .submitLabel(.continue).onSubmit { Task { await model.submit(using: state) } }
-                if let error = model.errorMessage { ErrorMessageView(message: error) }
+                if let report = state.enrollmentErrorReport {
+                    EnrollmentErrorView(report: report, copyText: state.enrollmentErrorCopyText(report))
+                } else if let error = model.errorMessage { ErrorMessageView(message: error) }
                 if model.isLoading { Label("Finding your study…", systemImage: "hourglass").foregroundStyle(InoxityTheme.secondaryText) }
                 PrimaryButton(title: "Continue", isEnabled: model.canContinue) { Task { await model.submit(using: state) } }
                 Text("Need help? Contact the research team that invited you.").font(.footnote).foregroundStyle(InoxityTheme.secondaryText).frame(maxWidth: .infinity, alignment: .center)

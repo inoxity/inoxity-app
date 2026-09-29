@@ -39,6 +39,30 @@ struct ErrorMessageView: View {
     let message: String
     var body: some View { Label(message, systemImage: "exclamationmark.circle").font(.subheadline).foregroundStyle(InoxityTheme.pink).frame(maxWidth: .infinity, alignment: .leading).accessibilityLabel("Error: \(message)") }
 }
+/// An enrollment failure: the message, its short code (which the research team looks up in the
+/// docs' "Enrollment error codes" table), and a button that copies the full details to send them.
+struct EnrollmentErrorView: View {
+    let report: EnrollmentErrorReport
+    let copyText: String
+    @State private var copied = false
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ErrorMessageView(message: report.message)
+            HStack(spacing: 12) {
+                Text("Code \(report.code)").font(.caption.monospaced().weight(.semibold)).foregroundStyle(InoxityTheme.secondaryText)
+                Button {
+                    UIPasteboard.general.string = copyText; copied = true
+                } label: {
+                    Label(copied ? "Copied" : "Copy error details", systemImage: copied ? "checkmark" : "doc.on.doc")
+                        .font(.caption.weight(.semibold))
+                }
+                .tint(InoxityTheme.aqua)
+                .accessibilityHint("Copies the error details so you can send them to the research team")
+            }
+        }
+        .onChange(of: report) { _, _ in copied = false }
+    }
+}
 struct SuccessMessageView: View {
     let message: String
     var body: some View { Label(message, systemImage: "checkmark.circle").font(.subheadline).foregroundStyle(InoxityTheme.aqua).frame(maxWidth: .infinity, alignment: .leading).accessibilityLabel("Success: \(message)") }

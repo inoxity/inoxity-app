@@ -58,6 +58,9 @@ final class AppState: ObservableObject {
     @Published private(set) var withdrawalErrorMessage: String?
     @Published private(set) var backendSyncResult: SyncResult?
     @Published private(set) var backendActionMessage: String?
+    /// The last enrollment failure, with its short code and "Copy error details" text. Shown by
+    /// StudyCodeView and ParticipantIDView; cleared when a new attempt starts.
+    @Published private(set) var enrollmentErrorReport: EnrollmentErrorReport?
     @Published private(set) var pendingWithdrawalCount = 0
     @Published private(set) var surveyEventDiagnostics: SurveyEventQueueDiagnostics = .empty
     @Published private(set) var newerConfigurationRevision: Int?
@@ -251,6 +254,35 @@ final class AppState: ObservableObject {
     }
 
     func enroll(with code: String) async throws {
+        try await withEnrollmentDiagnostics { try await self.performEnroll(with: code) }
+    }
+
+    /// Runs one enrollment step with its own failure recorder (see `EnrollmentDiagnostics`) and,
+    /// if it fails, publishes a coded report and prints the details to the Xcode console.
+    private func withEnrollmentDiagnostics<T>(_ operation: () async throws -> T) async throws -> T {
+        enrollmentErrorReport = nil
+        let recorder = EnrollmentDiagnosticsRecorder()
+        do {
+            return try await EnrollmentDiagnostics.$recorder.withValue(recorder) { try await operation() }
+        } catch WithdrawalError.retainedDataRequiresDecision {
+            throw WithdrawalError.retainedDataRequiresDecision   // handled by its own sheet, not an error
+        } catch {
+            let report = EnrollmentErrorReport.make(from: error, notes: recorder.notes, at: currentDate())
+            enrollmentErrorReport = report
+            #if DEBUG
+            print("[Inoxity enrollment error]\n" + enrollmentErrorCopyText(report))
+            #endif
+            throw error
+        }
+    }
+
+    func enrollmentErrorCopyText(_ report: EnrollmentErrorReport) -> String {
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
+        return report.copyText(studyCode: configuration?.identity.code ?? pendingResolvedStudy?.normalizedStudyCode,
+                               appVersion: "\(Self.appVersion) (\(build))", environment: backendEnvironment?.name.rawValue)
+    }
+
+    private func performEnroll(with code: String) async throws {
         backendActionMessage = "Checking study…"
         let loadedConfiguration: StudyConfiguration
         if let remoteFirst = provider as? RemoteFirstStudyConfigurationProvider {
@@ -296,7 +328,7 @@ final class AppState: ObservableObject {
         backendActionMessage = "Connecting securely…"
         do {
             let installationIdentifier = installationID
-            let remote = try await Self.withTimeout(seconds: Self.backendCallTimeoutSeconds) {
+            let remote = try await withEnrollmentDiagnostics { try await Self.withTimeout(seconds: Self.backendCallTimeoutSeconds) {
                 let context = try await factory.context(for: resolution)
                 guard context.identity == resolution.validatedIdentity else { throw BackendError.backendIdentityMismatch }
                 let installation = try await installationIdentifier.installationID()
@@ -305,7 +337,7 @@ final class AppState: ObservableObject {
                     participantIdentifier: validated, enrollmentAttemptID: attempt, installationID: installation,
                     configurationSchemaVersion: resolution.configurationSchemaVersion,
                     configurationRevision: resolution.configurationRevision))
-            }
+            } }
             backendActionMessage = "Registering enrollment…"
             let state = ParticipantState(participantUUID: UUID(), studyID: configuration.identity.id,
                 externalParticipantID: validated, onboardingStep: pendingOnboardingStep,
@@ -321,7 +353,7 @@ final class AppState: ObservableObject {
             try stateStore.saveState(state); stateStore.setActiveStudyCode(configuration.identity.code)
             participantState = state; backendActionMessage = "Enrollment registered"; return true
         } catch {
-            backendActionMessage = message(for: error); return false
+            backendActionMessage = enrollmentErrorReport?.message ?? message(for: error); return false
         }
     }
 
@@ -607,6 +639,7 @@ final class AppState: ObservableObject {
             group.addTask { try await operation() }
             group.addTask {
                 try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+                EnrollmentDiagnostics.record(detail: "No response within \(Int(seconds)) seconds", stage: .registration)
                 throw BackendError.unavailable
             }
             let result = try await group.next()!

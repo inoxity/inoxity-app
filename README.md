@@ -58,7 +58,7 @@ xcodebuild test -project Inoxity.xcodeproj -scheme Inoxity-Development \
 
 ### License
 
-This project is licensed under the [BSD 3-Clause License](LICENSE). See the [LICENSE](LICENSE) file for full terms.
+Copyright (c) 2026, Rachael Kee and Laasya Madgula. This project is licensed under the [BSD 3-Clause License](LICENSE). See the [LICENSE](LICENSE) file for full terms.
 
 ---
 
